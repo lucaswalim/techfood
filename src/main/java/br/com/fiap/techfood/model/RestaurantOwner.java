@@ -10,4 +10,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class RestaurantOwner extends User {
+
+    @Override
+    public UserType getType() {
+        return UserType.RESTAURANT_OWNER;
+    }
 }

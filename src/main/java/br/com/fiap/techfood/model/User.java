@@ -55,6 +55,8 @@ public abstract class User {
     @Embedded
     private Address address;
 
+    public abstract UserType getType();
+
     @PrePersist
     @PreUpdate
     private void updateLastUpdatedAt() {
