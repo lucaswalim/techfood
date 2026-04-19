@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.dto.response;
+package br.com.fiap.techfood.dto.response.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * @param timestamp Data e hora da resposta
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponse<T>(String message, T data, Meta meta, LocalDateTime timestamp) {
+public record ApiSuccessResponse<T>(String message, T data, Meta meta, LocalDateTime timestamp) {
 
     /**
      * Cria uma resposta de sucesso com dados.
@@ -27,8 +27,8 @@ public record ApiResponse<T>(String message, T data, Meta meta, LocalDateTime ti
      * @param data    Dados retornados
      * @return ApiResponse com payload
      */
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(
+    public static <T> ApiSuccessResponse<T> success(String message, T data) {
+        return new ApiSuccessResponse<>(
                 message,
                 data,
                 null,
@@ -48,8 +48,8 @@ public record ApiResponse<T>(String message, T data, Meta meta, LocalDateTime ti
      * @param meta    Metadados (paginação, total, etc.)
      * @return ApiResponse com payload e meta
      */
-    public static <T> ApiResponse<T> success(String message, T data, Meta meta) {
-        return new ApiResponse<>(
+    public static <T> ApiSuccessResponse<T> success(String message, T data, Meta meta) {
+        return new ApiSuccessResponse<>(
                 message,
                 data,
                 meta,
@@ -73,8 +73,8 @@ public record ApiResponse<T>(String message, T data, Meta meta, LocalDateTime ti
      * @param message Mensagem da resposta
      * @return ApiResponse sem payload
      */
-    public static ApiResponse<Void> success(String message) {
-        return new ApiResponse<>(
+    public static ApiSuccessResponse<Void> success(String message) {
+        return new ApiSuccessResponse<>(
                 message,
                 null,
                 null,
@@ -92,8 +92,8 @@ public record ApiResponse<T>(String message, T data, Meta meta, LocalDateTime ti
      * @param data Dados retornados
      * @return ApiResponse
      */
-    public static <T> ApiResponse<T> of(T data) {
-        return new ApiResponse<>(
+    public static <T> ApiSuccessResponse<T> of(T data) {
+        return new ApiSuccessResponse<>(
                 null,
                 data,
                 null,
@@ -108,8 +108,8 @@ public record ApiResponse<T>(String message, T data, Meta meta, LocalDateTime ti
      * @param meta Metadados
      * @return ApiResponse
      */
-    public static <T> ApiResponse<T> of(T data, Meta meta) {
-        return new ApiResponse<>(
+    public static <T> ApiSuccessResponse<T> of(T data, Meta meta) {
+        return new ApiSuccessResponse<>(
                 null,
                 data,
                 meta,

@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.dto.response;
+package br.com.fiap.techfood.dto.response.api;
 
 import org.springframework.data.domain.Page;
 

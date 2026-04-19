@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.dto.response;
+package br.com.fiap.techfood.dto.response.api;
 
 /**
  * Representa um erro de validação de campo.
