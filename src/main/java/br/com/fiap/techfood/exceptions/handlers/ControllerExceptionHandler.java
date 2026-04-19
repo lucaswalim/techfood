@@ -1,6 +1,8 @@
 package br.com.fiap.techfood.exceptions.handlers;
 
-import br.com.fiap.techfood.dto.response.ValidationError;
+import br.com.fiap.techfood.dto.response.api.ValidationError;
+import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
+import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -65,5 +67,25 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setDetail("Ocorreu um erro inesperado. Tente novamente mais tarde.");
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         return ResponseEntity.status(500).body(problemDetail);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleAlreadyExists(ResourceAlreadyExistsException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(409);
+        problemDetail.setTitle("Recurso já existe");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+        return ResponseEntity.status(409).body(problemDetail);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(401);
+        problemDetail.setTitle("Não autorizado");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+        return ResponseEntity.status(401).body(problemDetail);
     }
 }
