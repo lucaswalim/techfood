@@ -1,0 +1,46 @@
+### Atualizar parcialmente usuário
+### 200
+PATCH http://localhost:8080/users/a1f5c3d8-9e2b-4f0a-8b9c-1234567890ab
+Content-Type: application/json
+
+{
+  "name": "Ryland Grace",
+  "email": "teste@email.com",
+  "address": {
+      "street": "Rua das Flores",
+      "number": "124",
+      "city": "São Paulo",
+      "zipCode": "12345678"
+    }
+}
+
+### 404
+PATCH http://localhost:8080/users/a1f5c3d8-9e2b-4f0a-8b9c-1234567890ac
+Content-Type: application/json
+
+{
+  "name": "Ryland Grace",
+  "address": {
+      "street": "Rua das Flores",
+      "number": "124",
+      "city": "São Paulo",
+      "zipCode": "12345678"
+    }
+}
+
+### 400
+PATCH http://localhost:8080/users/errado
+Content-Type: application/json
+
+{
+  "name": "Ryland Grace"
+}
+
+### 409
+PATCH http://localhost:8080/users/a1f5c3d8-9e2b-4f0a-8b9c-1234567890ab
+Content-Type: application/json
+
+{
+  "name": "Ryland Grace",
+  "email": "maria@email.com"
+}
