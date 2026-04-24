@@ -7,6 +7,8 @@ import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
 import br.com.fiap.techfood.mapper.UserMapper;
 import br.com.fiap.techfood.model.User;
 import br.com.fiap.techfood.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -92,6 +94,17 @@ public class UserService {
         user = repository.save(user);
 
         return mapper.toResponse(user);
+    }
+
+    public UserResponseDTO findById(UUID id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+        return mapper.toResponse(user);
+    }
+
+    public Page<UserResponseDTO> searchByName(String name, Pageable pageable) {
+        return repository.findByNameContainingIgnoreCase(name, pageable)
+                .map(mapper::toResponse);
     }
 
     public void delete(UUID id) {

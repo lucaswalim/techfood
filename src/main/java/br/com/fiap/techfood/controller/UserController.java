@@ -4,15 +4,21 @@ import br.com.fiap.techfood.dto.request.UserPatchDTO;
 import br.com.fiap.techfood.dto.request.UserRequestDTO;
 import br.com.fiap.techfood.dto.response.UserResponseDTO;
 import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
+import br.com.fiap.techfood.dto.response.api.Meta;
 import br.com.fiap.techfood.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +30,34 @@ public class UserController {
 
     public UserController(UserService service) {
         this.service = service;
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar usuário por ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    public ResponseEntity<ApiSuccessResponse<UserResponseDTO>> findById(@PathVariable UUID id) {
+        UserResponseDTO response = service.findById(id);
+        return ApiSuccessResponse.ok(response);
+    }
+
+    @GetMapping
+    @Operation(summary = "Buscar usuários por nome")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso")
+    })
+    public ResponseEntity<ApiSuccessResponse<List<UserResponseDTO>>> searchByName(
+            @Parameter(description = "Nome ou parte do nome do usuário", example = "João")
+            @RequestParam String name,
+            @Parameter(description = "Número da página (começa em 0)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Quantidade de itens por página", example = "10")
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserResponseDTO> result = service.searchByName(name, pageable);
+        return ApiSuccessResponse.ok(result.getContent(), Meta.from(result));
     }
 
     @PostMapping
