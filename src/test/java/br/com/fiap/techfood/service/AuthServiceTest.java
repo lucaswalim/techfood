@@ -97,6 +97,28 @@ class AuthServiceTest {
     }
 
     @Nested
+    class LoadUserByUsernameTests {
+        @Test
+        void shouldLoadUserByUsername() {
+            Customer user = buildUser("joao", "hashed");
+            when(repository.findByLogin("joao")).thenReturn(Optional.of(user));
+
+            var userDetails = service.loadUserByUsername("joao");
+
+            assertThat(userDetails.getUsername()).isEqualTo("joao");
+            assertThat(userDetails.getPassword()).isEqualTo("hashed");
+        }
+
+        @Test
+        void shouldThrowWhenUserNotFoundOnLoad() {
+            when(repository.findByLogin("desconhecido")).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.loadUserByUsername("desconhecido"))
+                    .isInstanceOf(org.springframework.security.core.userdetails.UsernameNotFoundException.class);
+        }
+    }
+
+    @Nested
     class ChangePasswordTests {
         @Test
         void shouldChangePasswordSuccessfully() {
