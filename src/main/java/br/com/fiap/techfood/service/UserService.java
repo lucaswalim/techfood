@@ -7,12 +7,11 @@ import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
 import br.com.fiap.techfood.mapper.UserMapper;
 import br.com.fiap.techfood.model.User;
 import br.com.fiap.techfood.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -62,37 +61,37 @@ public class UserService {
 
     public UserResponseDTO patch(UUID id, UserPatchDTO dto) {
 
-    User user = repository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+        User user = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
-    // EMAIL
-    if (dto.email() != null && !dto.email().equals(user.getEmail())) {
-        if (repository.existsByEmail(dto.email())) {
-            throw new ResourceAlreadyExistsException("Email já cadastrado");
+        // EMAIL
+        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
+            if (repository.existsByEmail(dto.email())) {
+                throw new ResourceAlreadyExistsException("Email já cadastrado");
+            }
+            user.setEmail(dto.email());
         }
-        user.setEmail(dto.email());
-    }
 
-    // LOGIN
-    if (dto.login() != null && !dto.login().equals(user.getLogin())) {
-        if (repository.existsByLogin(dto.login())) {
-            throw new ResourceAlreadyExistsException("Login já cadastrado");
+        // LOGIN
+        if (dto.login() != null && !dto.login().equals(user.getLogin())) {
+            if (repository.existsByLogin(dto.login())) {
+                throw new ResourceAlreadyExistsException("Login já cadastrado");
+            }
+            user.setLogin(dto.login());
         }
-        user.setLogin(dto.login());
+
+        // NAME
+        if (dto.name() != null) {
+            user.setName(dto.name());
+        }
+
+        // ENDEREÇO
+        if (dto.address() != null) {
+            user.setAddress(mapper.toAddress(dto.address()));
+        }
+
+        user = repository.save(user);
+
+        return mapper.toResponse(user);
     }
-
-    // NAME
-    if (dto.name() != null) {
-        user.setName(dto.name());
-    }
-
-    // ENDEREÇO
-    if (dto.address() != null) {
-        user.setAddress(mapper.toAddress(dto.address()));
-    }
-
-    user = repository.save(user);
-
-    return mapper.toResponse(user);
-}
 }

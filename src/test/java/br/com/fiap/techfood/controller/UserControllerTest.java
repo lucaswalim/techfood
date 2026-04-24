@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
 
@@ -65,11 +66,11 @@ class UserControllerTest {
 
         when(service.create(request)).thenReturn(responseDTO);
 
-        ApiSuccessResponse<UserResponseDTO> response = controller.create(request);
+        ResponseEntity<ApiSuccessResponse<UserResponseDTO>> response = controller.create(request);
 
         assertThat(response).isNotNull();
-        assertThat(response.message()).isEqualTo("Usuário criado com sucesso");
-        assertThat(response.data()).isEqualTo(responseDTO);
+        assertThat(response.getBody().message()).isEqualTo("Usuário criado com sucesso");
+        assertThat(response.getBody().data()).isEqualTo(responseDTO);
         verify(service, times(1)).create(request);
     }
 

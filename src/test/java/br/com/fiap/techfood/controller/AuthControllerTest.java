@@ -32,10 +32,10 @@ class AuthControllerTest {
             LoginRequestDTO dto = new LoginRequestDTO("user", "senha");
             doNothing().when(service).login(dto);
 
-            ResponseEntity<ApiSuccessResponse<?>> response = controller.login(dto);
+            ResponseEntity<ApiSuccessResponse<String>> response = controller.login(dto);
 
             assertThat(response).isNotNull();
-            assertThat(response.getStatusCodeValue()).isEqualTo(200);
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
 
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().message()).isEqualTo("Usuário autenticado com sucesso");
@@ -52,10 +52,10 @@ class AuthControllerTest {
             ChangePasswordDTO dto = new ChangePasswordDTO("user", "oldPass", "newPass");
             doNothing().when(service).changePassword(userId, dto);
 
-            ResponseEntity<ApiSuccessResponse<?>> response = controller.changePassword(userId, dto);
+            ResponseEntity<ApiSuccessResponse<String>> response = controller.changePassword(userId, dto);
 
             assertThat(response).isNotNull();
-            assertThat(response.getStatusCodeValue()).isEqualTo(200);
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
 
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().message()).isEqualTo("Senha do usuário user alterada com sucesso");

@@ -30,23 +30,24 @@ public class AuthController {
             summary = "Login de usuário",
             description = "Valida login e senha usando BCrypt"
     )
-    @ApiResponse(responseCode = "200", description = "Login válido")
-    public ResponseEntity<ApiSuccessResponse<?>> login(@RequestBody @Valid LoginRequestDTO dto) {
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login válido"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
+    public ResponseEntity<ApiSuccessResponse<String>> login(@RequestBody @Valid LoginRequestDTO dto) {
         service.login(dto);
-        return ResponseEntity.ok(ApiSuccessResponse.success("Usuário autenticado com sucesso"));
+        return ApiSuccessResponse.okMessage("Usuário autenticado com sucesso");
     }
 
     @PutMapping("/users/{id}/password")
     @Operation(summary = "Trocar senha do usuário")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário ou senha invalidos"),
+            @ApiResponse(responseCode = "401", description = "Usuário ou senha inválidos"),
     })
-    public ResponseEntity<ApiSuccessResponse<?>> changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDTO dto) {
+    public ResponseEntity<ApiSuccessResponse<String>> changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDTO dto) {
         service.changePassword(id, dto);
-        return ResponseEntity.ok(ApiSuccessResponse.success(
-                String.format("Senha do usuário %s alterada com sucesso", dto.login())
-        ));
+        return ApiSuccessResponse.okMessage("Senha alterada com sucesso");
     }
 }
 

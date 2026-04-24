@@ -2,19 +2,18 @@ package br.com.fiap.techfood.controller;
 
 import br.com.fiap.techfood.dto.request.UserPatchDTO;
 import br.com.fiap.techfood.dto.request.UserRequestDTO;
-import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
 import br.com.fiap.techfood.dto.response.UserResponseDTO;
+import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
 import br.com.fiap.techfood.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -28,16 +27,15 @@ public class UserController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Criar usuário")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "409", description = "Usuário já existe")
     })
-    public ApiSuccessResponse<UserResponseDTO> create(@RequestBody @Valid UserRequestDTO dto) {
+    public ResponseEntity<ApiSuccessResponse<UserResponseDTO>> create(@RequestBody @Valid UserRequestDTO dto) {
         UserResponseDTO response = service.create(dto);
-        return ApiSuccessResponse.success("Usuário criado com sucesso", response);
+        return ApiSuccessResponse.created(response, "Usuário criado com sucesso");
     }
 
     @PatchMapping("/{id}")
@@ -48,11 +46,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "409", description = "Conflito de dados")
     })
-    public ApiSuccessResponse<UserResponseDTO> patch(
-            @PathVariable UUID id,
-            @RequestBody @Valid UserPatchDTO dto) {
-
+    public ResponseEntity<ApiSuccessResponse<UserResponseDTO>> patch(@PathVariable UUID id, @RequestBody @Valid UserPatchDTO dto) {
         UserResponseDTO response = service.patch(id, dto);
-        return ApiSuccessResponse.success("Usuário atualizado com sucesso", response);
+        return ApiSuccessResponse.ok(response);
     }
 }
