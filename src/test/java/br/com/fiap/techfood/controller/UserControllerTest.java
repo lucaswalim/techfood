@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +43,8 @@ class UserControllerTest {
     }
 
     private UserResponseDTO buildResponse() {
-        return new UserResponseDTO(UUID.randomUUID(), "João Silva", "joao@email.com", "joao123", buildAddress());
+        return new UserResponseDTO(UUID.randomUUID(), "João Silva", "joao@email.com", "joao123",
+                UserType.RESTAURANT_OWNER, buildAddress(), LocalDateTime.now());
     }
 
     @Nested

@@ -8,19 +8,19 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "Endereço do usuário")
 public record AddressDTO(
 
-        @NotBlank
-        @Schema(example = "Rua das Flores")
+        @NotBlank(message = "Rua é obrigatória")
         @Size(min = 3, max = 255)
+        @Schema(example = "Rua das Flores")
         String street,
 
-        @NotBlank
-        @Pattern(regexp = "\\d{1,20}", message = "O número deve conter apenas números e até 20 dígitos")
+        @NotBlank(message = "Número é obrigatório")
+        @Pattern(regexp = "\\d{1,20}", message = "O número deve conter apenas dígitos (máx. 20)")
         @Schema(example = "123")
         String number,
 
-        @NotBlank
-        @Schema(example = "São Paulo")
+        @NotBlank(message = "Cidade é obrigatória")
         @Size(min = 3, max = 255)
+        @Schema(example = "São Paulo")
         String city,
 
         @Pattern(regexp = "\\d{8}", message = "O CEP deve conter exatamente 8 números")

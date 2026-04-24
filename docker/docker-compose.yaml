@@ -34,10 +34,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/techfood
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: admin
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-#      SPRING_SQL_INIT_MODE: always
-#      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: true
-#      SPRING_SQL_INIT_DATA_LOCATIONS: classpath:data.sql
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      JWT_SECRET: ${JWT_SECRET:-dGVjaGZvb2Qtand0LXNlY3JldC1rZXktZmlhcC0yMDI0LXRlY2hjaGFsbGVuZ2U=}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
 
 volumes:
   pg_data:
