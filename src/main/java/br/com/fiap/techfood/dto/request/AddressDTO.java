@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "Endereço do usuário")
 public record AddressDTO(
 
         @NotBlank
@@ -23,6 +24,7 @@ public record AddressDTO(
         String city,
 
         @Pattern(regexp = "\\d{8}", message = "O CEP deve conter exatamente 8 números")
+        @Schema(example = "01310100")
         String zipCode
 ) {
 }
