@@ -2,10 +2,12 @@ package br.com.fiap.techfood.service;
 
 import br.com.fiap.techfood.dto.request.ChangePasswordDTO;
 import br.com.fiap.techfood.dto.request.LoginRequestDTO;
+import br.com.fiap.techfood.dto.response.TokenResponseDTO;
 import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
 import br.com.fiap.techfood.model.Address;
 import br.com.fiap.techfood.model.Customer;
 import br.com.fiap.techfood.repository.UserRepository;
+import br.com.fiap.techfood.security.JwtService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +34,8 @@ class AuthServiceTest {
     private UserRepository repository;
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
+    @Mock
+    private JwtService jwtService;
 
     private static final UUID USER_ID = UUID.randomUUID();
 
@@ -56,11 +60,15 @@ class AuthServiceTest {
 
             when(repository.findByLogin("joao")).thenReturn(Optional.of(user));
             when(passwordEncoder.matches("123", "hashed")).thenReturn(true);
+            when(jwtService.generateToken(user)).thenReturn("fake-jwt-token");
 
-            service.login(dto);
+            TokenResponseDTO result = service.login(dto);
 
+            assertThat(result.token()).isEqualTo("fake-jwt-token");
+            assertThat(result.type()).isEqualTo("Bearer");
             verify(repository).findByLogin("joao");
             verify(passwordEncoder).matches("123", "hashed");
+            verify(jwtService).generateToken(user);
         }
 
         @Test
