@@ -85,7 +85,6 @@ public class UserService {
             user.setName(dto.name());
         }
 
-        // ENDEREÇO
         if (dto.address() != null) {
             user.setAddress(mapper.toAddress(dto.address()));
         }
@@ -93,5 +92,13 @@ public class UserService {
         user = repository.save(user);
 
         return mapper.toResponse(user);
+    }
+
+    public void delete(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new NoSuchElementException("Usuário não encontrado");
+        }
+
+        repository.deleteById(id);
     }
 }
