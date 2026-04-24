@@ -58,7 +58,7 @@ class AuthControllerTest {
             assertThat(response.getStatusCode().value()).isEqualTo(200);
 
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().message()).isEqualTo("Senha do usuário user alterada com sucesso");
+            assertThat(response.getBody().message()).isEqualTo("Senha alterada com sucesso");
 
             verify(service, times(1)).changePassword(userId, dto);
         }

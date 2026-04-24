@@ -50,4 +50,15 @@ public class UserController {
         UserResponseDTO response = service.patch(id, dto);
         return ApiSuccessResponse.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Remover usuário")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Usuário removido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        service.delete(id);
+        return ApiSuccessResponse.noContent();
+    }
 }

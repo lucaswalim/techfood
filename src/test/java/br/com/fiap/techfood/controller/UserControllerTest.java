@@ -74,4 +74,18 @@ class UserControllerTest {
         verify(service, times(1)).create(request);
     }
 
+    @Test
+    void shouldDeleteUserSuccessfully() {
+        UUID id = UUID.randomUUID();
+
+        doNothing().when(service).delete(id);
+
+        ResponseEntity<Void> response = controller.delete(id);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+
+        verify(service, times(1)).delete(id);
+    }
+
 }
