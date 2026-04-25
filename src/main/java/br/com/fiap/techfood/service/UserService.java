@@ -49,7 +49,6 @@ public class UserService {
         User user = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
-        // EMAIL
         if (dto.email() != null && !dto.email().equals(user.getEmail())) {
             if (repository.existsByEmail(dto.email())) {
                 throw new ResourceAlreadyExistsException("Email já cadastrado");
@@ -57,7 +56,6 @@ public class UserService {
             user.setEmail(dto.email());
         }
 
-        // LOGIN
         if (dto.login() != null && !dto.login().equals(user.getLogin())) {
             if (repository.existsByLogin(dto.login())) {
                 throw new ResourceAlreadyExistsException("Login já cadastrado");
@@ -65,7 +63,6 @@ public class UserService {
             user.setLogin(dto.login());
         }
 
-        // NAME
         if (dto.name() != null) {
             user.setName(dto.name());
         }

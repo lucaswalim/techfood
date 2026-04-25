@@ -34,3 +34,5 @@ build/
 
 ### Local ###
 CHECKLIST.md
+.DS_Store
+requests.http
