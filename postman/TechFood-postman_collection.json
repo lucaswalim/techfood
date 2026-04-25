@@ -1,0 +1,2564 @@
+{
+  "info": {
+    "_postman_id": "f7a2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "TechFood API - Coleção Completa de Testes",
+    "description": "Coleção completa de testes da API TechFood.\n\n**Ordem de execução recomendada:**\n1. [1] Setup - execute todos para criar usuários e obter token\n2. [2] Auth - Login\n3. [3] Auth - Trocar Senha\n4. [4] Usuários - Criar\n5. [5] Usuários - Buscar por ID\n6. [6] Usuários - Buscar por Nome\n7. [7] Usuários - Atualizar (PATCH)\n8. [8] Usuários - Excluir\n9. [9] Cleanup - execute ao final para limpar dados\n\n**Pré-requisito:** API rodando em http://localhost:8080",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080", "type": "string"},
+    {"key": "token", "value": "", "type": "string"},
+    {"key": "userId", "value": "", "type": "string"},
+    {"key": "ownerUserId", "value": "", "type": "string"},
+    {"key": "deleteTargetId", "value": "", "type": "string"},
+    {"key": "pwdChangeUserId", "value": "", "type": "string"},
+    {"key": "extraUserId1", "value": "", "type": "string"},
+    {"key": "extraUserId2", "value": "", "type": "string"},
+    {"key": "extraUserId3", "value": "", "type": "string"},
+    {"key": "mainLogin", "value": "", "type": "string"},
+    {"key": "mainEmail", "value": "", "type": "string"},
+    {"key": "mainPassword", "value": "senha123", "type": "string"},
+    {"key": "ownerLogin", "value": "", "type": "string"},
+    {"key": "ownerEmail", "value": "", "type": "string"},
+    {"key": "deleteTargetLogin", "value": "", "type": "string"},
+    {"key": "deleteTargetEmail", "value": "", "type": "string"},
+    {"key": "pwdChangeLogin", "value": "", "type": "string"},
+    {"key": "pwdChangeEmail", "value": "", "type": "string"},
+    {"key": "pwdChangePassword", "value": "senha123", "type": "string"}
+  ],
+  "item": [
+    {
+      "name": "[1] Setup - Configuração Inicial",
+      "description": "Execute esta pasta COMPLETA antes de qualquer outro teste. Cria os usuários necessários e obtém o token JWT.",
+      "item": [
+        {
+          "name": "1.1 Criar Usuário Principal (CUSTOMER)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('mainLogin', 'main_' + ts);",
+                  "pm.collectionVariables.set('mainEmail', 'main_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - Usuário criado', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar userId na variável', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.data).to.have.property('id');",
+                  "    pm.collectionVariables.set('userId', body.data.id);",
+                  "});",
+                  "pm.test('Mensagem de criação correta', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Usuário criado com sucesso');",
+                  "});",
+                  "pm.test('Tipo CUSTOMER', function () {",
+                  "    pm.expect(pm.response.json().data.type).to.eql('CUSTOMER');",
+                  "});",
+                  "pm.test('Login salvo corretamente', function () {",
+                  "    pm.expect(pm.response.json().data.login).to.eql(pm.collectionVariables.get('mainLogin'));",
+                  "});",
+                  "pm.test('Resposta contém todos os campos esperados', function () {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data).to.have.all.keys('id', 'name', 'email', 'login', 'type', 'address', 'lastUpdatedAt');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Principal\",\n  \"email\": \"{{mainEmail}}\",\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"{{mainPassword}}\",\n  \"address\": {\n    \"street\": \"Rua das Flores\",\n    \"number\": \"123\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "1.2 Criar Usuário RESTAURANT_OWNER",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('ownerLogin', 'owner_' + ts);",
+                  "pm.collectionVariables.set('ownerEmail', 'owner_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - Proprietário criado', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar ownerUserId na variável', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('ownerUserId', body.data.id);",
+                  "    pm.collectionVariables.set('ownerEmail', body.data.email);",
+                  "});",
+                  "pm.test('Tipo RESTAURANT_OWNER', function () {",
+                  "    pm.expect(pm.response.json().data.type).to.eql('RESTAURANT_OWNER');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Proprietária\",\n  \"email\": \"{{ownerEmail}}\",\n  \"login\": \"{{ownerLogin}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Av. Paulista\",\n    \"number\": \"456\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01311000\"\n  },\n  \"type\": \"RESTAURANT_OWNER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "1.3 Criar Usuário Para Exclusão",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('deleteTargetLogin', 'del_' + ts);",
+                  "pm.collectionVariables.set('deleteTargetEmail', 'del_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - Usuário para exclusão criado', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar deleteTargetId na variável', function () {",
+                  "    pm.collectionVariables.set('deleteTargetId', pm.response.json().data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário Para Deletar\",\n  \"email\": \"{{deleteTargetEmail}}\",\n  \"login\": \"{{deleteTargetLogin}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua da Exclusão\",\n    \"number\": \"999\",\n    \"city\": \"Rio de Janeiro\",\n    \"zipCode\": \"20040020\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "1.4 Criar Usuário Para Troca de Senha",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('pwdChangeLogin', 'pwd_' + ts);",
+                  "pm.collectionVariables.set('pwdChangeEmail', 'pwd_' + ts + '@techfood.test');",
+                  "pm.collectionVariables.set('pwdChangePassword', 'senha123');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - Usuário para troca de senha criado', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar pwdChangeUserId na variável', function () {",
+                  "    pm.collectionVariables.set('pwdChangeUserId', pm.response.json().data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário Troca Senha\",\n  \"email\": \"{{pwdChangeEmail}}\",\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua do Segredo\",\n    \"number\": \"007\",\n    \"city\": \"Curitiba\",\n    \"zipCode\": \"80010080\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "1.5 Login - Autenticar Usuário Principal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Login bem-sucedido', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Salvar token JWT na variável', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.data).to.have.property('token');",
+                  "    pm.collectionVariables.set('token', body.data.token);",
+                  "});",
+                  "pm.test('Token não é vazio', function () {",
+                  "    pm.expect(pm.collectionVariables.get('token')).to.not.be.empty;",
+                  "});",
+                  "pm.test('Tipo do token é Bearer', function () {",
+                  "    pm.expect(pm.response.json().data.type).to.eql('Bearer');",
+                  "});",
+                  "pm.test('Mensagem de autenticação correta', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Usuário autenticado com sucesso');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"{{mainPassword}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[2] Auth - Login",
+      "description": "Testes do endpoint POST /v1/auth/login",
+      "item": [
+        {
+          "name": "2.1 Login - Sucesso (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Resposta contém token', function () {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data).to.have.property('token');",
+                  "    pm.expect(data.token).to.be.a('string').and.not.be.empty;",
+                  "});",
+                  "pm.test('Tipo do token é Bearer', function () {",
+                  "    pm.expect(pm.response.json().data.type).to.eql('Bearer');",
+                  "});",
+                  "pm.test('Mensagem de sucesso', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Usuário autenticado com sucesso');",
+                  "});",
+                  "pm.test('Resposta tem timestamp', function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('timestamp');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"{{mainPassword}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.2 Login - Senha Incorreta (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Não autorizado', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Título indica não autorizado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Não autorizado');",
+                  "});",
+                  "pm.test('Detalhe indica credenciais incorretas', function () {",
+                  "    pm.expect(pm.response.json().detail).to.eql('Usuário ou senha incorreta');",
+                  "});",
+                  "pm.test('Resposta segue formato ProblemDetail', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('status').that.eqls(401);",
+                  "    pm.expect(body).to.have.property('title');",
+                  "    pm.expect(body).to.have.property('detail');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"senhaErrada999\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.3 Login - Usuário Inexistente (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Usuário não encontrado', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Resposta segue formato ProblemDetail', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('status').that.eqls(401);",
+                  "    pm.expect(body).to.have.property('title');",
+                  "    pm.expect(body).to.have.property('detail');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"usuario_que_nao_existe_xyz99\",\n  \"password\": \"senha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.4 Login - Login em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Validação falhou', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Título indica erro de validação', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Erro de validação');",
+                  "});",
+                  "pm.test('Contém erros de validação', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('errors');",
+                  "    pm.expect(body.errors).to.be.an('array').and.not.be.empty;",
+                  "});",
+                  "pm.test('Erro aponta para campo login', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const loginError = errors.find(e => e.field === 'login');",
+                  "    pm.expect(loginError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"\",\n  \"password\": \"senha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.5 Login - Senha em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Validação falhou', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Contém erro no campo password', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const pwdError = errors.find(e => e.field === 'password');",
+                  "    pm.expect(pwdError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.6 Login - Login Muito Curto < 3 chars (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Login muito curto', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Contém erro de validação', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('errors');",
+                  "    pm.expect(body.errors).to.be.an('array').and.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"ab\",\n  \"password\": \"senha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.7 Login - Senha Muito Curta < 6 chars (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Senha muito curta', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Contém erro de validação', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('errors');",
+                  "    pm.expect(body.errors).to.be.an('array').and.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"abc\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.8 Login - Body Vazio (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Body vazio', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[3] Auth - Trocar Senha",
+      "description": "Testes do endpoint PUT /v1/auth/users/{id}/password\nRequer token JWT. Execute a pasta [1] Setup antes.",
+      "item": [
+        {
+          "name": "3.1 Trocar Senha - Sucesso (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Senha alterada', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Mensagem de sucesso', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Senha alterada com sucesso');",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('pwdChangePassword', 'novaSenha123');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"currentPassword\": \"senha123\",\n  \"newPassword\": \"novaSenha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.2 Trocar Senha - Senha Atual Errada (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Senha atual incorreta', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Título indica não autorizado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Não autorizado');",
+                  "});",
+                  "pm.test('Detalhe indica credenciais inválidas', function () {",
+                  "    pm.expect(pm.response.json().detail).to.include('inválid');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"currentPassword\": \"senha123\",\n  \"newPassword\": \"outraSenha456\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.3 Trocar Senha - Login Não Corresponde ao ID (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Login não corresponde', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Detalhe indica que login não corresponde', function () {",
+                  "    pm.expect(pm.response.json().detail).to.include('não corresponde');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"loginQueNaoCorresponde_xyz\",\n  \"currentPassword\": \"novaSenha123\",\n  \"newPassword\": \"outraSenha456\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.4 Trocar Senha - Usuário Não Encontrado (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Usuário não encontrado retorna 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Resposta segue formato ProblemDetail', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('status');",
+                  "    pm.expect(body).to.have.property('title');",
+                  "    pm.expect(body).to.have.property('detail');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"qualquerLogin\",\n  \"currentPassword\": \"senha123\",\n  \"newPassword\": \"novaSenha456\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/00000000-0000-0000-0000-000000000000/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "00000000-0000-0000-0000-000000000000", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.5 Trocar Senha - Validação: Login em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Login obrigatório', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo login', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const loginError = errors.find(e => e.field === 'login');",
+                  "    pm.expect(loginError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"\",\n  \"currentPassword\": \"{{pwdChangePassword}}\",\n  \"newPassword\": \"novaSenha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.6 Trocar Senha - Validação: Senha Atual em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Senha atual obrigatória', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo currentPassword', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const pwdError = errors.find(e => e.field === 'currentPassword');",
+                  "    pm.expect(pwdError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"currentPassword\": \"\",\n  \"newPassword\": \"novaSenha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.7 Trocar Senha - Validação: Nova Senha em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Nova senha obrigatória', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo newPassword', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const pwdError = errors.find(e => e.field === 'newPassword');",
+                  "    pm.expect(pwdError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"currentPassword\": \"{{pwdChangePassword}}\",\n  \"newPassword\": \"\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.8 Trocar Senha - Nova Senha Muito Curta (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Nova senha muito curta', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Contém erro de validação', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('errors');",
+                  "    pm.expect(body.errors).to.be.an('array').and.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"currentPassword\": \"{{pwdChangePassword}}\",\n  \"newPassword\": \"abc\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        },
+        {
+          "name": "3.9 Trocar Senha - Sem Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Token não fornecido', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{pwdChangeLogin}}\",\n  \"currentPassword\": \"{{pwdChangePassword}}\",\n  \"newPassword\": \"novaSenha123\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/users/{{pwdChangeUserId}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "users", "{{pwdChangeUserId}}", "password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[4] Usuários - Criar (POST /v1/users)",
+      "description": "Testes do endpoint POST /v1/users\nEndpoint público — não requer autenticação.",
+      "item": [
+        {
+          "name": "4.1 Criar Usuário CUSTOMER - Sucesso (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('extra1Login', 'extra1_' + ts);",
+                  "pm.collectionVariables.set('extra1Email', 'extra1_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - CUSTOMER criado', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar extraUserId1', function () {",
+                  "    pm.collectionVariables.set('extraUserId1', pm.response.json().data.id);",
+                  "});",
+                  "pm.test('Tipo CUSTOMER', function () {",
+                  "    pm.expect(pm.response.json().data.type).to.eql('CUSTOMER');",
+                  "});",
+                  "pm.test('Mensagem de criação', function () {",
+                  "    pm.expect(pm.response.json().message).to.eql('Usuário criado com sucesso');",
+                  "});",
+                  "pm.test('Dados do endereço presentes', function () {",
+                  "    const address = pm.response.json().data.address;",
+                  "    pm.expect(address).to.have.property('street');",
+                  "    pm.expect(address).to.have.property('number');",
+                  "    pm.expect(address).to.have.property('city');",
+                  "    pm.expect(address).to.have.property('zipCode');",
+                  "});",
+                  "pm.test('ID é um UUID válido', function () {",
+                  "    const id = pm.response.json().data.id;",
+                  "    pm.expect(id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);",
+                  "});",
+                  "pm.test('Senha não é retornada na resposta', function () {",
+                  "    pm.expect(pm.response.json().data).to.not.have.property('password');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Extra Cliente Um\",\n  \"email\": \"{{extra1Email}}\",\n  \"login\": \"{{extra1Login}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua dos Extras\",\n    \"number\": \"100\",\n    \"city\": \"Belo Horizonte\",\n    \"zipCode\": \"30130010\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.2 Criar Usuário RESTAURANT_OWNER - Sucesso (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('extra2Login', 'extra2_' + ts);",
+                  "pm.collectionVariables.set('extra2Email', 'extra2_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - RESTAURANT_OWNER criado', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar extraUserId2', function () {",
+                  "    pm.collectionVariables.set('extraUserId2', pm.response.json().data.id);",
+                  "});",
+                  "pm.test('Tipo RESTAURANT_OWNER', function () {",
+                  "    pm.expect(pm.response.json().data.type).to.eql('RESTAURANT_OWNER');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Extra Proprietário Dois\",\n  \"email\": \"{{extra2Email}}\",\n  \"login\": \"{{extra2Login}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Av. dos Restaurantes\",\n    \"number\": \"200\",\n    \"city\": \"Porto Alegre\",\n    \"zipCode\": \"90010100\"\n  },\n  \"type\": \"RESTAURANT_OWNER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.3 Criar Usuário Sem Token - Deve Ter Sucesso (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('extra3Login', 'extra3_' + ts);",
+                  "pm.collectionVariables.set('extra3Email', 'extra3_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 - Endpoint público não requer token', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Salvar extraUserId3', function () {",
+                  "    pm.collectionVariables.set('extraUserId3', pm.response.json().data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário Sem Token\",\n  \"email\": \"{{extra3Email}}\",\n  \"login\": \"{{extra3Login}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Sem Token\",\n    \"number\": \"300\",\n    \"city\": \"Salvador\",\n    \"zipCode\": \"40010010\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.4 Criar Usuário - Email Duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409 - Email já cadastrado', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Título indica recurso duplicado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Recurso já existe');",
+                  "});",
+                  "pm.test('Detalhe menciona email ou já existe', function () {",
+                  "    const detail = pm.response.json().detail.toLowerCase();",
+                  "    pm.expect(detail).to.satisfy(d => d.includes('email') || d.includes('já') || d.includes('existe'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Outro Usuário Email Igual\",\n  \"email\": \"{{mainEmail}}\",\n  \"login\": \"login_diferente_xyz99\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.5 Criar Usuário - Login Duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409 - Login já cadastrado', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Título indica recurso duplicado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Recurso já existe');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Outro Usuário Login Igual\",\n  \"email\": \"email_diferente_xyz99@test.com\",\n  \"login\": \"{{mainLogin}}\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.6 Criar Usuário - Nome em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Nome obrigatório', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo name', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const nameError = errors.find(e => e.field === 'name');",
+                  "    pm.expect(nameError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.7 Criar Usuário - Email em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Email obrigatório', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo email', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const emailError = errors.find(e => e.field === 'email');",
+                  "    pm.expect(emailError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.8 Criar Usuário - Email Inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Formato de email inválido', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo email', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const emailError = errors.find(e => e.field === 'email');",
+                  "    pm.expect(emailError).to.not.be.undefined;",
+                  "});",
+                  "pm.test('Mensagem indica email inválido', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const emailError = errors.find(e => e.field === 'email');",
+                  "    pm.expect(emailError.message).to.include('inválido');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"email-invalido-sem-arroba\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.9 Criar Usuário - Login em Branco (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Login obrigatório', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo login', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const loginError = errors.find(e => e.field === 'login');",
+                  "    pm.expect(loginError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.10 Criar Usuário - Senha Muito Curta (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Senha muito curta', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo password', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const pwdError = errors.find(e => e.field === 'password');",
+                  "    pm.expect(pwdError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"abc\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.11 Criar Usuário - CEP com Menos de 8 Dígitos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - CEP inválido (< 8 dígitos)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo address.zipCode', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const zipError = errors.find(e => e.field.includes('zipCode'));",
+                  "    pm.expect(zipError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"0131010\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.12 Criar Usuário - CEP com Letras (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - CEP com letras inválido', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo address.zipCode', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const zipError = errors.find(e => e.field.includes('zipCode'));",
+                  "    pm.expect(zipError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"ABCDEFGH\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.13 Criar Usuário - Número do Endereço com Letras (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Número do endereço inválido', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo address.number', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const numError = errors.find(e => e.field.includes('number'));",
+                  "    pm.expect(numError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"12A\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.14 Criar Usuário - Endereço Nulo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Endereço obrigatório', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo address', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const addressError = errors.find(e => e.field === 'address');",
+                  "    pm.expect(addressError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": null,\n  \"type\": \"CUSTOMER\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.15 Criar Usuário - Tipo de Usuário Nulo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Tipo de usuário obrigatório', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo type', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const typeError = errors.find(e => e.field === 'type');",
+                  "    pm.expect(typeError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Válido\",\n  \"email\": \"valido@test.com\",\n  \"login\": \"loginValido\",\n  \"password\": \"senha123\",\n  \"address\": {\n    \"street\": \"Rua Qualquer\",\n    \"number\": \"1\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"01310100\"\n  },\n  \"type\": null\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "4.16 Criar Usuário - Múltiplos Campos Inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Múltiplas validações falharam', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Múltiplos erros retornados', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    pm.expect(errors.length).to.be.greaterThan(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"email\": \"email-invalido\",\n  \"login\": \"\",\n  \"password\": \"ab\",\n  \"address\": null,\n  \"type\": null\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[5] Usuários - Buscar por ID (GET /v1/users/{id})",
+      "description": "Testes do endpoint GET /v1/users/{id}\nRequer token JWT.",
+      "item": [
+        {
+          "name": "5.1 Buscar por ID - Sucesso (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Usuário encontrado', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('ID corresponde ao solicitado', function () {",
+                  "    pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get('userId'));",
+                  "});",
+                  "pm.test('Resposta contém todos os campos do usuário', function () {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data).to.have.all.keys('id', 'name', 'email', 'login', 'type', 'address', 'lastUpdatedAt');",
+                  "});",
+                  "pm.test('Endereço contém campos esperados', function () {",
+                  "    const address = pm.response.json().data.address;",
+                  "    pm.expect(address).to.have.all.keys('street', 'number', 'city', 'zipCode');",
+                  "});",
+                  "pm.test('Senha não é retornada', function () {",
+                  "    pm.expect(pm.response.json().data).to.not.have.property('password');",
+                  "});",
+                  "pm.test('Tipo de usuário é válido', function () {",
+                  "    const type = pm.response.json().data.type;",
+                  "    pm.expect(['CUSTOMER', 'RESTAURANT_OWNER']).to.include(type);",
+                  "});",
+                  "pm.test('Resposta tem timestamp', function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('timestamp');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "5.2 Buscar por ID - Usuário Não Encontrado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 - Usuário não encontrado', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Título indica recurso não encontrado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Recurso não encontrado');",
+                  "});",
+                  "pm.test('Resposta segue formato ProblemDetail', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('status').that.eqls(404);",
+                  "    pm.expect(body).to.have.property('title');",
+                  "    pm.expect(body).to.have.property('detail');",
+                  "    pm.expect(body).to.have.property('instance');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "00000000-0000-0000-0000-000000000000"]
+            }
+          }
+        },
+        {
+          "name": "5.3 Buscar por ID - Sem Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Token não fornecido', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[6] Usuários - Buscar por Nome (GET /v1/users?name=...)",
+      "description": "Testes do endpoint GET /v1/users com paginação\nRequer token JWT.",
+      "item": [
+        {
+          "name": "6.1 Buscar por Nome - Com Resultados (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Busca realizada', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Data é um array', function () {",
+                  "    pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});",
+                  "pm.test('Ao menos um resultado encontrado', function () {",
+                  "    pm.expect(pm.response.json().data.length).to.be.greaterThan(0);",
+                  "});",
+                  "pm.test('Resposta contém metadados de paginação', function () {",
+                  "    const meta = pm.response.json().meta;",
+                  "    pm.expect(meta).to.have.property('totalElements');",
+                  "    pm.expect(meta).to.have.property('totalPages');",
+                  "    pm.expect(meta).to.have.property('page');",
+                  "    pm.expect(meta).to.have.property('size');",
+                  "    pm.expect(meta).to.have.property('hasNext');",
+                  "    pm.expect(meta).to.have.property('hasPrevious');",
+                  "});",
+                  "pm.test('totalElements condiz com resultados', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.meta.totalElements).to.be.greaterThan(0);",
+                  "});",
+                  "pm.test('Cada usuário tem campos obrigatórios', function () {",
+                  "    pm.response.json().data.forEach(user => {",
+                  "        pm.expect(user).to.have.property('id');",
+                  "        pm.expect(user).to.have.property('name');",
+                  "        pm.expect(user).to.have.property('email');",
+                  "        pm.expect(user).to.have.property('login');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users?name=Principal&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"],
+              "query": [
+                {"key": "name", "value": "Principal"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "6.2 Buscar por Nome - Sem Resultados (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Busca sem resultados', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Data é array vazio', function () {",
+                  "    pm.expect(pm.response.json().data).to.be.an('array').that.is.empty;",
+                  "});",
+                  "pm.test('totalElements é zero', function () {",
+                  "    pm.expect(pm.response.json().meta.totalElements).to.eql(0);",
+                  "});",
+                  "pm.test('totalPages é zero', function () {",
+                  "    pm.expect(pm.response.json().meta.totalPages).to.eql(0);",
+                  "});",
+                  "pm.test('hasNext é false', function () {",
+                  "    pm.expect(pm.response.json().meta.hasNext).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users?name=NomeMuitoRaroQueDefinitivamenteNaoExistexyz99999&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"],
+              "query": [
+                {"key": "name", "value": "NomeMuitoRaroQueDefinitivamenteNaoExistexyz99999"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "6.3 Buscar por Nome - Paginação (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Paginação funcionando', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Página atual é 0', function () {",
+                  "    pm.expect(pm.response.json().meta.page).to.eql(0);",
+                  "});",
+                  "pm.test('Tamanho da página é 1', function () {",
+                  "    pm.expect(pm.response.json().meta.size).to.eql(1);",
+                  "});",
+                  "pm.test('Máximo 1 elemento por página', function () {",
+                  "    pm.expect(pm.response.json().data.length).to.be.at.most(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users?name=Principal&page=0&size=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"],
+              "query": [
+                {"key": "name", "value": "Principal"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "6.4 Buscar por Nome - Segunda Página (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Segunda página acessível', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Página atual é 1', function () {",
+                  "    pm.expect(pm.response.json().meta.page).to.eql(1);",
+                  "});",
+                  "pm.test('hasPrevious é true', function () {",
+                  "    pm.expect(pm.response.json().meta.hasPrevious).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users?name=&page=1&size=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"],
+              "query": [
+                {"key": "name", "value": ""},
+                {"key": "page", "value": "1"},
+                {"key": "size", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "6.5 Buscar por Nome - Sem Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Token não fornecido', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users?name=teste&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users"],
+              "query": [
+                {"key": "name", "value": "teste"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[7] Usuários - Atualizar (PATCH /v1/users/{id})",
+      "description": "Testes do endpoint PATCH /v1/users/{id}\nRequer token JWT. Execute a pasta [1] Setup antes.",
+      "item": [
+        {
+          "name": "7.1 Atualizar Nome - Sucesso (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Nome atualizado', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Nome foi atualizado corretamente', function () {",
+                  "    pm.expect(pm.response.json().data.name).to.eql('Nome Atualizado Via Patch');",
+                  "});",
+                  "pm.test('Outros campos não foram alterados', function () {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.id).to.eql(pm.collectionVariables.get('userId'));",
+                  "    pm.expect(data.type).to.eql('CUSTOMER');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nome Atualizado Via Patch\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.2 Atualizar Email - Sucesso (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('patchEmail', 'patched_' + ts + '@techfood.test');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Email atualizado', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Email foi atualizado corretamente', function () {",
+                  "    pm.expect(pm.response.json().data.email).to.eql(pm.collectionVariables.get('patchEmail'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{patchEmail}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.3 Atualizar Endereço - Sucesso (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Endereço atualizado', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Rua foi atualizada', function () {",
+                  "    pm.expect(pm.response.json().data.address.street).to.eql('Avenida Brasil Atualizada');",
+                  "});",
+                  "pm.test('CEP foi atualizado', function () {",
+                  "    pm.expect(pm.response.json().data.address.zipCode).to.eql('20040900');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": {\n    \"street\": \"Avenida Brasil Atualizada\",\n    \"number\": \"500\",\n    \"city\": \"Rio de Janeiro\",\n    \"zipCode\": \"20040900\"\n  }\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.4 Atualizar Login - Sucesso (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('patchLogin', 'patched_login_' + ts);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Login atualizado', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Login foi atualizado corretamente', function () {",
+                  "    pm.expect(pm.response.json().data.login).to.eql(pm.collectionVariables.get('patchLogin'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{patchLogin}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.5 Atualizar Múltiplos Campos - Sucesso (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Múltiplos campos atualizados', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Nome atualizado', function () {",
+                  "    pm.expect(pm.response.json().data.name).to.eql('João Silva Atualizado');",
+                  "});",
+                  "pm.test('lastUpdatedAt está presente', function () {",
+                  "    pm.expect(pm.response.json().data).to.have.property('lastUpdatedAt');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"address\": {\n    \"street\": \"Rua Nova\",\n    \"number\": \"999\",\n    \"city\": \"Campinas\",\n    \"zipCode\": \"13010100\"\n  }\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.6 Atualizar - Usuário Não Encontrado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 - Usuário não encontrado', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Título indica recurso não encontrado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Recurso não encontrado');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Não Vai Funcionar\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "00000000-0000-0000-0000-000000000000"]
+            }
+          }
+        },
+        {
+          "name": "7.7 Atualizar - Email Inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Email inválido no patch', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo email', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const emailError = errors.find(e => e.field === 'email');",
+                  "    pm.expect(emailError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"formato-invalido-sem-arroba\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.8 Atualizar - Login Muito Curto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - Login muito curto no patch', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo login', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const loginError = errors.find(e => e.field === 'login');",
+                  "    pm.expect(loginError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"ab\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.9 Atualizar - Email Duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409 - Email já pertence a outro usuário', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Título indica recurso duplicado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Recurso já existe');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ownerEmail}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.10 Atualizar - CEP Inválido no Endereço (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 - CEP inválido no patch', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Erro aponta para campo zipCode', function () {",
+                  "    const errors = pm.response.json().errors;",
+                  "    const zipError = errors.find(e => e.field.includes('zipCode'));",
+                  "    pm.expect(zipError).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": {\n    \"street\": \"Rua Válida\",\n    \"number\": \"10\",\n    \"city\": \"São Paulo\",\n    \"zipCode\": \"123\"\n  }\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "7.11 Atualizar - Sem Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Token não fornecido', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sem Token\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[8] Usuários - Excluir (DELETE /v1/users/{id})",
+      "description": "Testes do endpoint DELETE /v1/users/{id}\nRequer token JWT.\n\nAVISO: O teste 8.1 exclui o deleteTargetId criado no Setup. Não execute se quiser preservar os dados.",
+      "item": [
+        {
+          "name": "8.1 Excluir Usuário - Sucesso (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 - Usuário excluído', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('Body está vazio', function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{deleteTargetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{deleteTargetId}}"]
+            }
+          }
+        },
+        {
+          "name": "8.2 Excluir Usuário Já Excluído - Não Encontrado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 - Usuário já foi excluído', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Título indica recurso não encontrado', function () {",
+                  "    pm.expect(pm.response.json().title).to.eql('Recurso não encontrado');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{deleteTargetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{deleteTargetId}}"]
+            }
+          }
+        },
+        {
+          "name": "8.3 Excluir Usuário - UUID Inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 - UUID inexistente', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Resposta segue formato ProblemDetail', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('status').that.eqls(404);",
+                  "    pm.expect(body).to.have.property('title');",
+                  "    pm.expect(body).to.have.property('instance');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "00000000-0000-0000-0000-000000000000"]
+            }
+          }
+        },
+        {
+          "name": "8.4 Excluir Usuário - Sem Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 - Token não fornecido', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[9] Cleanup - Limpeza de Dados",
+      "description": "Execute esta pasta APÓS todos os testes para remover os dados criados durante a execução.\nTodos os testes devem retornar 204 (ou 404 se já foram excluídos).",
+      "item": [
+        {
+          "name": "9.1 Cleanup - Excluir Usuário Principal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Usuário principal removido (204 ou 404)', function () {",
+                  "    pm.expect([204, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "9.2 Cleanup - Excluir Usuário RESTAURANT_OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Proprietário removido (204 ou 404)', function () {",
+                  "    pm.expect([204, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{ownerUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{ownerUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "9.3 Cleanup - Excluir Usuário Para Troca de Senha",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Usuário troca senha removido (204 ou 404)', function () {",
+                  "    pm.expect([204, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{pwdChangeUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{pwdChangeUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "9.4 Cleanup - Excluir Extra User 1 (CUSTOMER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Extra user 1 removido (204 ou 404)', function () {",
+                  "    pm.expect([204, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{extraUserId1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{extraUserId1}}"]
+            }
+          }
+        },
+        {
+          "name": "9.5 Cleanup - Excluir Extra User 2 (RESTAURANT_OWNER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Extra user 2 removido (204 ou 404)', function () {",
+                  "    pm.expect([204, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{extraUserId2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{extraUserId2}}"]
+            }
+          }
+        },
+        {
+          "name": "9.6 Cleanup - Excluir Extra User 3 (Sem Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Extra user 3 removido (204 ou 404)', function () {",
+                  "    pm.expect([204, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/{{extraUserId3}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "{{extraUserId3}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

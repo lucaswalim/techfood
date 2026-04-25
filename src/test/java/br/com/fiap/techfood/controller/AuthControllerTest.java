@@ -2,6 +2,7 @@ package br.com.fiap.techfood.controller;
 
 import br.com.fiap.techfood.dto.request.ChangePasswordDTO;
 import br.com.fiap.techfood.dto.request.LoginRequestDTO;
+import br.com.fiap.techfood.dto.response.TokenResponseDTO;
 import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
 import br.com.fiap.techfood.service.AuthService;
 import org.junit.jupiter.api.Nested;
@@ -30,14 +31,17 @@ class AuthControllerTest {
         @Test
         void shouldLoginSuccessfully() {
             LoginRequestDTO dto = new LoginRequestDTO("user", "senha");
-            doNothing().when(service).login(dto);
+            TokenResponseDTO tokenDTO = new TokenResponseDTO("fake-jwt-token");
 
-            ResponseEntity<ApiSuccessResponse<String>> response = controller.login(dto);
+            when(service.login(dto)).thenReturn(tokenDTO);
+
+            ResponseEntity<ApiSuccessResponse<TokenResponseDTO>> response = controller.login(dto);
 
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode().value()).isEqualTo(200);
-
             assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().data().token()).isEqualTo("fake-jwt-token");
+            assertThat(response.getBody().data().type()).isEqualTo("Bearer");
             assertThat(response.getBody().message()).isEqualTo("Usuário autenticado com sucesso");
 
             verify(service, times(1)).login(dto);
@@ -56,7 +60,6 @@ class AuthControllerTest {
 
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode().value()).isEqualTo(200);
-
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().message()).isEqualTo("Senha alterada com sucesso");
 

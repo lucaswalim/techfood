@@ -7,6 +7,8 @@ import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
 import br.com.fiap.techfood.mapper.UserMapper;
 import br.com.fiap.techfood.model.User;
 import br.com.fiap.techfood.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,23 +28,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Cria um novo usuário no sistema.
-     *
-     * <p>O método realiza as seguintes operações:</p>
-     * <ol>
-     *     <li>Valida se o e-mail já está cadastrado e lança {@link ResourceAlreadyExistsException} se positivo.</li>
-     *     <li>Valida se o login já está cadastrado e lança {@link ResourceAlreadyExistsException} se positivo.</li>
-     *     <li>Converte o DTO {@link UserRequestDTO} para a entidade {@link User}.</li>
-     *     <li>Codifica a senha utilizando BCrypt.</li>
-     *     <li>Salva o usuário no banco de dados.</li>
-     *     <li>Converte a entidade salva para {@link UserResponseDTO} e retorna.</li>
-     * </ol>
-     *
-     * @param dto dados do usuário a serem criados
-     * @return {@link UserResponseDTO} com os dados do usuário criado
-     * @throws ResourceAlreadyExistsException se o e-mail ou login já estiverem cadastrados
-     */
     public UserResponseDTO create(UserRequestDTO dto) {
         if (repository.existsByEmail(dto.email())) {
             throw new ResourceAlreadyExistsException("Email já cadastrado");
@@ -64,7 +49,6 @@ public class UserService {
         User user = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
-        // EMAIL
         if (dto.email() != null && !dto.email().equals(user.getEmail())) {
             if (repository.existsByEmail(dto.email())) {
                 throw new ResourceAlreadyExistsException("Email já cadastrado");
@@ -72,7 +56,6 @@ public class UserService {
             user.setEmail(dto.email());
         }
 
-        // LOGIN
         if (dto.login() != null && !dto.login().equals(user.getLogin())) {
             if (repository.existsByLogin(dto.login())) {
                 throw new ResourceAlreadyExistsException("Login já cadastrado");
@@ -80,7 +63,6 @@ public class UserService {
             user.setLogin(dto.login());
         }
 
-        // NAME
         if (dto.name() != null) {
             user.setName(dto.name());
         }
@@ -92,6 +74,17 @@ public class UserService {
         user = repository.save(user);
 
         return mapper.toResponse(user);
+    }
+
+    public UserResponseDTO findById(UUID id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+        return mapper.toResponse(user);
+    }
+
+    public Page<UserResponseDTO> searchByName(String name, Pageable pageable) {
+        return repository.findByNameContainingIgnoreCase(name, pageable)
+                .map(mapper::toResponse);
     }
 
     public void delete(UUID id) {

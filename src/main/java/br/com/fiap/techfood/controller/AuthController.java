@@ -2,20 +2,25 @@ package br.com.fiap.techfood.controller;
 
 import br.com.fiap.techfood.dto.request.ChangePasswordDTO;
 import br.com.fiap.techfood.dto.request.LoginRequestDTO;
+import br.com.fiap.techfood.dto.response.TokenResponseDTO;
 import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
 import br.com.fiap.techfood.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/v1/auth")
 @Tag(name = "Auth", description = "Autenticação de usuários")
 public class AuthController {
 
@@ -28,27 +33,35 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(
             summary = "Login de usuário",
-            description = "Valida login e senha usando BCrypt"
+            description = "Valida login e senha e retorna um token JWT para uso nas demais requisições"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Login válido"),
-            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+            @ApiResponse(responseCode = "200", description = "Login válido — token JWT retornado"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
-    public ResponseEntity<ApiSuccessResponse<String>> login(@RequestBody @Valid LoginRequestDTO dto) {
-        service.login(dto);
-        return ApiSuccessResponse.okMessage("Usuário autenticado com sucesso");
+    public ResponseEntity<ApiSuccessResponse<TokenResponseDTO>> login(@RequestBody @Valid LoginRequestDTO dto) {
+        TokenResponseDTO token = service.login(dto);
+        return ApiSuccessResponse.ok(token, "Usuário autenticado com sucesso");
     }
 
     @PutMapping("/users/{id}/password")
-    @Operation(summary = "Trocar senha do usuário")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Trocar senha do usuário",
+            description = "Altera a senha do usuário. Requer o login e a senha atual para confirmação"
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Usuário ou senha inválidos"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário ou senha inválidos",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<ApiSuccessResponse<String>> changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDTO dto) {
         service.changePassword(id, dto);
         return ApiSuccessResponse.okMessage("Senha alterada com sucesso");
     }
 }
-
-
