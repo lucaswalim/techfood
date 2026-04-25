@@ -28,23 +28,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Cria um novo usuário no sistema.
-     *
-     * <p>O método realiza as seguintes operações:</p>
-     * <ol>
-     *     <li>Valida se o e-mail já está cadastrado e lança {@link ResourceAlreadyExistsException} se positivo.</li>
-     *     <li>Valida se o login já está cadastrado e lança {@link ResourceAlreadyExistsException} se positivo.</li>
-     *     <li>Converte o DTO {@link UserRequestDTO} para a entidade {@link User}.</li>
-     *     <li>Codifica a senha utilizando BCrypt.</li>
-     *     <li>Salva o usuário no banco de dados.</li>
-     *     <li>Converte a entidade salva para {@link UserResponseDTO} e retorna.</li>
-     * </ol>
-     *
-     * @param dto dados do usuário a serem criados
-     * @return {@link UserResponseDTO} com os dados do usuário criado
-     * @throws ResourceAlreadyExistsException se o e-mail ou login já estiverem cadastrados
-     */
     public UserResponseDTO create(UserRequestDTO dto) {
         if (repository.existsByEmail(dto.email())) {
             throw new ResourceAlreadyExistsException("Email já cadastrado");
