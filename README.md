@@ -20,13 +20,13 @@ Esse sistema permitirá que os clientes escolham restaurantes com base na comida
 - Spring Boot 3.4.2
 - Spring Web
 - Spring Data JPA
-- Spring Security + JWT (JJWT 0.12.6)
+- Spring Security + JWT
 - PostgreSQL
 - Flyway (versionamento de schema)
 - Docker & Docker Compose
-- MapStruct 1.5.5
+- MapStruct
 - Lombok
-- SpringDoc OpenAPI 2.8.5 (Swagger)
+- SpringDoc OpenAPI
 - Maven
 
 ---
@@ -49,6 +49,9 @@ Princípios aplicados:
 - SOLID
 - Clean Code
 - Separação de responsabilidades
+
+### Diagrama de Arquitetura (Fase 1):
+![Diagrama de Arquitetura](./img/architectureDiagram.png)
 
 ---
 
@@ -82,6 +85,12 @@ Configuração padrão:
 - Database: techfood
 - Usuário: postgres
 - Senha: admin
+
+### Diagrama de Classes (Fase 1)
+![Class Diagram](./img/classDiagram.png)
+
+### Modelo Entidade-Relacionamento (Fase 1)
+![MER Diagram](./img/MERdiagram.png)
 
 ### Versionamento com Flyway
 
@@ -271,22 +280,6 @@ Executar JAR diretamente:
 ```bash
 java -jar target/techfood-0.0.1-SNAPSHOT.jar
 ```
-
----
-
-## Versionamento de API
-
-A API segue estratégia de versionamento (ex: `/v1/...`), permitindo evolução sem quebra de compatibilidade com clientes antigos.
-
----
-
-## Diferenciais
-
-- Arquitetura limpa
-- Uso de MapStruct para mapeamento eficiente DTO ↔ Entity
-- Flyway para controle de versões do schema do banco
-- Spring Security com JWT
-- Testes unitários automatizados
 
 ---
 
