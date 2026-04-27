@@ -202,7 +202,7 @@ A aplicação estará disponível em: http://localhost:8080
 
 ---
 
-## Documentação da API
+## Documentação Swagger
 
 Documentação interativa disponível em:
 
@@ -216,6 +216,8 @@ Especificação OpenAPI (JSON):
 http://localhost:8080/v3/api-docs
 ```
 
+![Swagger](./img/swagger.png)
+
 ---
 
 ## Testes com Postman
@@ -227,13 +229,8 @@ Importar no Postman:
 2. File → Import
 3. Selecionar arquivo `postman/TechFood-postman_collection.json`
 
-Cenários cobertos:
-- Cadastro válido
-- Cadastro inválido (e-mail duplicado)
-- Alteração de senha
-- Atualização de dados
-- Busca por nome
-- Validação de login
+![Postman](./img/postman.png)
+
 
 ---
 
@@ -273,23 +270,16 @@ Compilar e gerar artefato JAR executável:
 mvn clean install
 ```
 
-Artefato gerado: `target/techfood-0.0.1-SNAPSHOT.jar`
-
-Executar JAR diretamente:
-
-```bash
-java -jar target/techfood-0.0.1-SNAPSHOT.jar
-```
 
 ---
 
 ## Grupo
 
-- Lucas Walim
-- Pamela Mendes
-- Rafael
-- Rodrigo Daniel
-- Rodrigo de Barros
+- Lucas Walim da Silva
+- Pamela Mendes Ribeiro
+- Rafael Oliveira Rodrigues Valle
+- Rodrigo Eufrásio Daniel
+- Rodrigo Cavalcante de Barros
 
 
-**Projeto desenvolvido na pós-graduação em Arquitetura e Desenvolvimento Java pela FIAP.**
+**Projeto desenvolvido na pós-tech em Arquitetura e Desenvolvimento Java pela FIAP.**
