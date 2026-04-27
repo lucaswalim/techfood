@@ -155,6 +155,7 @@ A API segue o padrão RFC 7807 (Problem Details) para padronização das respost
 #### Subir ambiente completo (aplicação + PostgreSQL):
 
 ```bash
+cd docker
 docker-compose up --build
 ```
 
@@ -163,10 +164,11 @@ A aplicação estará disponível em: http://localhost:8080
 #### Subir apenas o PostgreSQL:
 
 ```bash
-docker-compose -f docker/docker-compose-postgres.yaml up -d
+cd docker
+docker-compose -f docker-compose-postgres.yaml up -d
 ```
 
-Depois execute:
+Depois execute (na raiz do projeto):
 ```bash
 mvn clean install
 mvn spring-boot:run
