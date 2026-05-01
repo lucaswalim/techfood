@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @InjectMocks
-    private UserService service;
+    private UserServiceImpl service;
     @Mock
     private UserRepository repository;
     @Mock
@@ -220,6 +220,41 @@ class UserServiceTest {
 
             assertThat(result).isEqualTo(responseDTO);
             assertThat(customer.getName()).isEqualTo("Novo Nome");
+            verify(repository).save(customer);
+        }
+
+        @Test
+        void shouldPatchLoginSuccessfullyWhenLoginIsDiferent() {
+            UUID id = UUID.randomUUID();
+            Customer customer = buildCustomer(id, "joao@email.com", "joao123");
+            UserPatchDTO patchDTO = new UserPatchDTO(null, null, "novoLogin", null);
+
+            when(repository.findById(id)).thenReturn(Optional.of(customer));
+            when(repository.existsByLogin("novoLogin")).thenReturn(false);
+            when(repository.save(customer)).thenReturn(customer);
+            when(mapper.toResponse(customer)).thenReturn(responseDTO);
+
+            service.patch(id, patchDTO);
+
+            assertThat(customer.getLogin()).isEqualTo("novoLogin");
+            verify(repository).existsByLogin("novoLogin");
+            verify(repository).save(customer);
+        }
+
+        @Test
+        void shouldNotCheckLoginConflictWhenLoginIsSame() {
+            UUID id = UUID.randomUUID();
+            Customer customer = buildCustomer(id, "joao@email.com", "joao123");
+            UserPatchDTO patchDTO = new UserPatchDTO(null, null, "joao123", null);
+
+            when(repository.findById(id)).thenReturn(Optional.of(customer));
+            when(repository.save(customer)).thenReturn(customer);
+            when(mapper.toResponse(customer)).thenReturn(responseDTO);
+
+            service.patch(id, patchDTO);
+
+            assertThat(customer.getLogin()).isEqualTo("joao123");
+            verify(repository, never()).existsByLogin(any());
             verify(repository).save(customer);
         }
 

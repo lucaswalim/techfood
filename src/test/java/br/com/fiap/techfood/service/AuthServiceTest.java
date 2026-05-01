@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 class AuthServiceTest {
 
     @InjectMocks
-    private AuthService service;
+    private AuthServiceImpl service;
     @Mock
     private UserRepository repository;
     @Mock
