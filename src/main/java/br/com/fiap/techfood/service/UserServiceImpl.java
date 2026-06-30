@@ -1,97 +1,57 @@
 package br.com.fiap.techfood.service;
 
+import br.com.fiap.techfood.application.usecase.createuser.CreateUserUseCase;
+import br.com.fiap.techfood.application.usecase.user.DeleteUserUseCase;
+import br.com.fiap.techfood.application.usecase.user.FindUserByIdUseCase;
+import br.com.fiap.techfood.application.usecase.user.PatchUserUseCase;
+import br.com.fiap.techfood.application.usecase.user.SearchUsersByNameUseCase;
 import br.com.fiap.techfood.dto.request.UserPatchDTO;
 import br.com.fiap.techfood.dto.request.UserRequestDTO;
 import br.com.fiap.techfood.dto.response.UserResponseDTO;
-import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
-import br.com.fiap.techfood.mapper.UserMapper;
-import br.com.fiap.techfood.model.User;
-import br.com.fiap.techfood.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository repository;
-    private final UserMapper mapper;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final CreateUserUseCase createUserUseCase;
+    private final PatchUserUseCase patchUserUseCase;
+    private final FindUserByIdUseCase findUserByIdUseCase;
+    private final SearchUsersByNameUseCase searchUsersByNameUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
 
-    public UserServiceImpl(UserRepository repository, UserMapper mapper, BCryptPasswordEncoder passwordEncoder) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.passwordEncoder = passwordEncoder;
+    public UserServiceImpl(CreateUserUseCase createUserUseCase,
+                           PatchUserUseCase patchUserUseCase,
+                           FindUserByIdUseCase findUserByIdUseCase,
+                           SearchUsersByNameUseCase searchUsersByNameUseCase,
+                           DeleteUserUseCase deleteUserUseCase) {
+        this.createUserUseCase = createUserUseCase;
+        this.patchUserUseCase = patchUserUseCase;
+        this.findUserByIdUseCase = findUserByIdUseCase;
+        this.searchUsersByNameUseCase = searchUsersByNameUseCase;
+        this.deleteUserUseCase = deleteUserUseCase;
     }
 
     public UserResponseDTO create(UserRequestDTO dto) {
-        if (repository.existsByEmail(dto.email())) {
-            throw new ResourceAlreadyExistsException("Email já cadastrado");
-        }
-
-        if (repository.existsByLogin(dto.login())) {
-            throw new ResourceAlreadyExistsException("Login já cadastrado");
-        }
-
-        User user = mapper.toEntity(dto);
-        user.setPassword(passwordEncoder.encode(dto.password()));
-        user = repository.save(user);
-
-        return mapper.toResponse(user);
+        return createUserUseCase.execute(dto);
     }
 
     public UserResponseDTO patch(UUID id, UserPatchDTO dto) {
-
-        User user = repository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
-
-        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
-            if (repository.existsByEmail(dto.email())) {
-                throw new ResourceAlreadyExistsException("Email já cadastrado");
-            }
-            user.setEmail(dto.email());
-        }
-
-        if (dto.login() != null && !dto.login().equals(user.getLogin())) {
-            if (repository.existsByLogin(dto.login())) {
-                throw new ResourceAlreadyExistsException("Login já cadastrado");
-            }
-            user.setLogin(dto.login());
-        }
-
-        if (dto.name() != null) {
-            user.setName(dto.name());
-        }
-
-        if (dto.address() != null) {
-            user.setAddress(mapper.toAddress(dto.address()));
-        }
-
-        user = repository.save(user);
-
-        return mapper.toResponse(user);
+        return patchUserUseCase.execute(id, dto);
     }
 
     public UserResponseDTO findById(UUID id) {
-        User user = repository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
-        return mapper.toResponse(user);
+        return findUserByIdUseCase.execute(id);
     }
 
     public Page<UserResponseDTO> searchByName(String name, Pageable pageable) {
-        return repository.findByNameContainingIgnoreCase(name, pageable)
-                .map(mapper::toResponse);
+        return searchUsersByNameUseCase.execute(name, pageable);
     }
 
     public void delete(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new NoSuchElementException("Usuário não encontrado");
-        }
-
-        repository.deleteById(id);
+        deleteUserUseCase.execute(id);
     }
 }
