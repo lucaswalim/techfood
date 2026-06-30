@@ -2,7 +2,6 @@ package br.com.fiap.techfood.infrastructure.security;
 
 import br.com.fiap.techfood.application.gateway.TokenGateway;
 import br.com.fiap.techfood.model.User;
-import br.com.fiap.techfood.security.JwtService;
 import org.springframework.stereotype.Component;
 
 @Component

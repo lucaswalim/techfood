@@ -1,5 +1,6 @@
 package br.com.fiap.techfood.security;
 
+import br.com.fiap.techfood.infrastructure.security.JwtService;
 import br.com.fiap.techfood.model.Address;
 import br.com.fiap.techfood.model.Customer;
 import org.junit.jupiter.api.BeforeEach;

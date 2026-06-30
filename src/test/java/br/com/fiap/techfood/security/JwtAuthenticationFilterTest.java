@@ -1,5 +1,7 @@
 package br.com.fiap.techfood.security;
 
+import br.com.fiap.techfood.infrastructure.security.JwtAuthenticationFilter;
+import br.com.fiap.techfood.infrastructure.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +21,9 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
