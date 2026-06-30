@@ -1,11 +1,17 @@
 package br.com.fiap.techfood.controller;
 
-import br.com.fiap.techfood.dto.request.ChangePasswordDTO;
-import br.com.fiap.techfood.dto.request.LoginRequestDTO;
-import br.com.fiap.techfood.dto.response.TokenResponseDTO;
-import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
-import br.com.fiap.techfood.service.AuthService;
-import org.junit.jupiter.api.Nested;
+import br.com.fiap.techfood.adapters.controller.AuthController;
+import br.com.fiap.techfood.adapters.mapper.AdapterMapper;
+import br.com.fiap.techfood.adapters.presenter.ApiResponseFactory;
+import br.com.fiap.techfood.adapters.request.ChangePasswordRequest;
+import br.com.fiap.techfood.adapters.request.LoginRequest;
+import br.com.fiap.techfood.adapters.response.TokenResponse;
+import br.com.fiap.techfood.adapters.response.api.ApiSuccessResponse;
+import br.com.fiap.techfood.application.dto.ChangePasswordCommand;
+import br.com.fiap.techfood.application.dto.LoginCommand;
+import br.com.fiap.techfood.application.dto.TokenResult;
+import br.com.fiap.techfood.application.usecase.auth.ChangePasswordUseCase;
+import br.com.fiap.techfood.application.usecase.login.LoginUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +22,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -24,46 +32,45 @@ class AuthControllerTest {
     @InjectMocks
     private AuthController controller;
     @Mock
-    private AuthService service;
+    private LoginUseCase loginUseCase;
+    @Mock
+    private ChangePasswordUseCase changePasswordUseCase;
+    @Mock
+    private AdapterMapper adapterMapper;
+    @Mock
+    private ApiResponseFactory presenter;
 
-    @Nested
-    class LoginTests {
-        @Test
-        void shouldLoginSuccessfully() {
-            LoginRequestDTO dto = new LoginRequestDTO("user", "senha");
-            TokenResponseDTO tokenDTO = new TokenResponseDTO("fake-jwt-token");
+    @Test
+    void shouldLoginSuccessfully() {
+        LoginRequest request = new LoginRequest("user", "senha");
+        LoginCommand command = new LoginCommand("user", "senha");
+        TokenResult result = new TokenResult("fake-jwt-token");
+        TokenResponse responseBody = new TokenResponse("fake-jwt-token", "Bearer");
+        ResponseEntity<ApiSuccessResponse<TokenResponse>> response = ApiSuccessResponse.ok(responseBody, "Usuário autenticado com sucesso");
+        when(adapterMapper.toCommand(request)).thenReturn(command);
+        when(loginUseCase.execute(command)).thenReturn(result);
+        when(adapterMapper.toResponse(result)).thenReturn(responseBody);
+        when(presenter.ok(responseBody, "Usuário autenticado com sucesso")).thenReturn(response);
 
-            when(service.login(dto)).thenReturn(tokenDTO);
+        ResponseEntity<ApiSuccessResponse<TokenResponse>> actual = controller.login(request);
 
-            ResponseEntity<ApiSuccessResponse<TokenResponseDTO>> response = controller.login(dto);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getStatusCode().value()).isEqualTo(200);
-            assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().data().token()).isEqualTo("fake-jwt-token");
-            assertThat(response.getBody().data().type()).isEqualTo("Bearer");
-            assertThat(response.getBody().message()).isEqualTo("Usuário autenticado com sucesso");
-
-            verify(service, times(1)).login(dto);
-        }
+        assertThat(actual.getStatusCode().value()).isEqualTo(200);
+        verify(loginUseCase).execute(command);
     }
 
-    @Nested
-    class ChangePasswordTests {
-        @Test
-        void shouldChangePasswordSuccessfully() {
-            UUID userId = UUID.randomUUID();
-            ChangePasswordDTO dto = new ChangePasswordDTO("user", "oldPass", "newPass");
-            doNothing().when(service).changePassword(userId, dto);
+    @Test
+    void shouldChangePasswordSuccessfully() {
+        UUID userId = UUID.randomUUID();
+        ChangePasswordRequest request = new ChangePasswordRequest("user", "oldPass", "newPass");
+        ChangePasswordCommand command = new ChangePasswordCommand("user", "oldPass", "newPass");
+        ResponseEntity<ApiSuccessResponse<String>> response = ApiSuccessResponse.okMessage("Senha alterada com sucesso");
+        when(adapterMapper.toCommand(request)).thenReturn(command);
+        doNothing().when(changePasswordUseCase).execute(userId, command);
+        when(presenter.okMessage("Senha alterada com sucesso")).thenReturn(response);
 
-            ResponseEntity<ApiSuccessResponse<String>> response = controller.changePassword(userId, dto);
+        ResponseEntity<ApiSuccessResponse<String>> actual = controller.changePassword(userId, request);
 
-            assertThat(response).isNotNull();
-            assertThat(response.getStatusCode().value()).isEqualTo(200);
-            assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().message()).isEqualTo("Senha alterada com sucesso");
-
-            verify(service, times(1)).changePassword(userId, dto);
-        }
+        assertThat(actual.getStatusCode().value()).isEqualTo(200);
+        verify(changePasswordUseCase).execute(userId, command);
     }
 }

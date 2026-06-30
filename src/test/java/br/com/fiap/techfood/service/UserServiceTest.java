@@ -1,13 +1,13 @@
 package br.com.fiap.techfood.service;
 
+import br.com.fiap.techfood.application.dto.UserCreateCommand;
+import br.com.fiap.techfood.application.dto.UserPatchCommand;
+import br.com.fiap.techfood.application.dto.UserResult;
 import br.com.fiap.techfood.application.usecase.createuser.CreateUserUseCase;
 import br.com.fiap.techfood.application.usecase.user.DeleteUserUseCase;
 import br.com.fiap.techfood.application.usecase.user.FindUserByIdUseCase;
 import br.com.fiap.techfood.application.usecase.user.PatchUserUseCase;
 import br.com.fiap.techfood.application.usecase.user.SearchUsersByNameUseCase;
-import br.com.fiap.techfood.dto.request.UserPatchDTO;
-import br.com.fiap.techfood.dto.request.UserRequestDTO;
-import br.com.fiap.techfood.dto.response.UserResponseDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,36 +43,36 @@ class UserServiceTest {
 
     @Test
     void shouldDelegateCreate() {
-        UserRequestDTO dto = new UserRequestDTO("João", "joao@email.com", "joao123", "123456", null, null);
-        UserResponseDTO response = new UserResponseDTO(UUID.randomUUID(), "João", "joao@email.com", "joao123", null, null, null);
-        when(createUserUseCase.execute(dto)).thenReturn(response);
+        UserCreateCommand command = new UserCreateCommand("João", "joao@email.com", "joao123", "123456", null, null);
+        UserResult response = new UserResult(UUID.randomUUID(), "João", "joao@email.com", "joao123", null, null, null);
+        when(createUserUseCase.execute(command)).thenReturn(response);
 
-        UserResponseDTO result = service.create(dto);
+        UserResult result = service.create(command);
 
         assertThat(result).isEqualTo(response);
-        verify(createUserUseCase).execute(dto);
+        verify(createUserUseCase).execute(command);
     }
 
     @Test
     void shouldDelegatePatch() {
         UUID id = UUID.randomUUID();
-        UserPatchDTO dto = new UserPatchDTO("Novo Nome", null, null, null);
-        UserResponseDTO response = new UserResponseDTO(id, "Novo Nome", "joao@email.com", "joao123", null, null, null);
-        when(patchUserUseCase.execute(id, dto)).thenReturn(response);
+        UserPatchCommand command = new UserPatchCommand("Novo Nome", null, null, null);
+        UserResult response = new UserResult(id, "Novo Nome", "joao@email.com", "joao123", null, null, null);
+        when(patchUserUseCase.execute(id, command)).thenReturn(response);
 
-        UserResponseDTO result = service.patch(id, dto);
+        UserResult result = service.patch(id, command);
 
         assertThat(result).isEqualTo(response);
-        verify(patchUserUseCase).execute(id, dto);
+        verify(patchUserUseCase).execute(id, command);
     }
 
     @Test
     void shouldDelegateFindById() {
         UUID id = UUID.randomUUID();
-        UserResponseDTO response = new UserResponseDTO(id, "João", "joao@email.com", "joao123", null, null, null);
+        UserResult response = new UserResult(id, "João", "joao@email.com", "joao123", null, null, null);
         when(findUserByIdUseCase.execute(id)).thenReturn(response);
 
-        UserResponseDTO result = service.findById(id);
+        UserResult result = service.findById(id);
 
         assertThat(result).isEqualTo(response);
         verify(findUserByIdUseCase).execute(id);
@@ -80,10 +80,10 @@ class UserServiceTest {
 
     @Test
     void shouldDelegateSearchByName() {
-        Page<UserResponseDTO> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+        Page<UserResult> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
         when(searchUsersByNameUseCase.execute("João", PageRequest.of(0, 10))).thenReturn(page);
 
-        Page<UserResponseDTO> result = service.searchByName("João", PageRequest.of(0, 10));
+        Page<UserResult> result = service.searchByName("João", PageRequest.of(0, 10));
 
         assertThat(result).isEqualTo(page);
         verify(searchUsersByNameUseCase).execute("João", PageRequest.of(0, 10));

@@ -1,15 +1,14 @@
 package br.com.fiap.techfood.service;
 
-import br.com.fiap.techfood.dto.request.ChangePasswordDTO;
-import br.com.fiap.techfood.dto.request.LoginRequestDTO;
-import br.com.fiap.techfood.dto.response.TokenResponseDTO;
+import br.com.fiap.techfood.application.dto.ChangePasswordCommand;
+import br.com.fiap.techfood.application.dto.LoginCommand;
+import br.com.fiap.techfood.application.dto.TokenResult;
 
 import java.util.UUID;
 
 public interface AuthService {
 
-    TokenResponseDTO login(LoginRequestDTO dto);
+    TokenResult login(LoginCommand command);
 
-    void changePassword(UUID id, ChangePasswordDTO dto);
-
+    void changePassword(UUID id, ChangePasswordCommand command);
 }

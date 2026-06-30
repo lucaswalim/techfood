@@ -1,5 +1,6 @@
 package br.com.fiap.techfood.exceptions.handlers;
 
+import br.com.fiap.techfood.adapters.exception.ControllerExceptionHandler;
 import br.com.fiap.techfood.config.TestSecurityConfig;
 import br.com.fiap.techfood.controller.TestExceptionController;
 import org.junit.jupiter.api.Test;

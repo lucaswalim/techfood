@@ -1,8 +1,8 @@
 package br.com.fiap.techfood.service;
 
-import br.com.fiap.techfood.dto.request.UserPatchDTO;
-import br.com.fiap.techfood.dto.request.UserRequestDTO;
-import br.com.fiap.techfood.dto.response.UserResponseDTO;
+import br.com.fiap.techfood.application.dto.UserCreateCommand;
+import br.com.fiap.techfood.application.dto.UserPatchCommand;
+import br.com.fiap.techfood.application.dto.UserResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,13 +10,13 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserResponseDTO create(UserRequestDTO dto);
+    UserResult create(UserCreateCommand command);
 
-    UserResponseDTO patch(UUID id, UserPatchDTO dto);
+    UserResult patch(UUID id, UserPatchCommand command);
 
-    UserResponseDTO findById(UUID id);
+    UserResult findById(UUID id);
 
-    Page<UserResponseDTO> searchByName(String name, Pageable pageable);
+    Page<UserResult> searchByName(String name, Pageable pageable);
 
     void delete(UUID id);
 }

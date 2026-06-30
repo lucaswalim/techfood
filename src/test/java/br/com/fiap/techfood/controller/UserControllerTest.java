@@ -1,13 +1,21 @@
 package br.com.fiap.techfood.controller;
 
-import br.com.fiap.techfood.dto.request.AddressDTO;
-import br.com.fiap.techfood.dto.request.UserPatchDTO;
-import br.com.fiap.techfood.dto.request.UserRequestDTO;
-import br.com.fiap.techfood.dto.response.UserResponseDTO;
-import br.com.fiap.techfood.dto.response.api.ApiSuccessResponse;
+import br.com.fiap.techfood.adapters.controller.UserController;
+import br.com.fiap.techfood.adapters.mapper.AdapterMapper;
+import br.com.fiap.techfood.adapters.presenter.ApiResponseFactory;
+import br.com.fiap.techfood.adapters.request.UserPatchRequest;
+import br.com.fiap.techfood.adapters.request.UserRequest;
+import br.com.fiap.techfood.adapters.response.UserResponse;
+import br.com.fiap.techfood.adapters.response.api.ApiSuccessResponse;
+import br.com.fiap.techfood.application.dto.UserCreateCommand;
+import br.com.fiap.techfood.application.dto.UserPatchCommand;
+import br.com.fiap.techfood.application.dto.UserResult;
+import br.com.fiap.techfood.application.usecase.createuser.CreateUserUseCase;
+import br.com.fiap.techfood.application.usecase.user.DeleteUserUseCase;
+import br.com.fiap.techfood.application.usecase.user.FindUserByIdUseCase;
+import br.com.fiap.techfood.application.usecase.user.PatchUserUseCase;
+import br.com.fiap.techfood.application.usecase.user.SearchUsersByNameUseCase;
 import br.com.fiap.techfood.model.UserType;
-import br.com.fiap.techfood.service.UserService;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +31,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -31,113 +41,100 @@ class UserControllerTest {
     @InjectMocks
     private UserController controller;
     @Mock
-    private UserService service;
+    private CreateUserUseCase createUserUseCase;
+    @Mock
+    private PatchUserUseCase patchUserUseCase;
+    @Mock
+    private FindUserByIdUseCase findUserByIdUseCase;
+    @Mock
+    private SearchUsersByNameUseCase searchUsersByNameUseCase;
+    @Mock
+    private DeleteUserUseCase deleteUserUseCase;
+    @Mock
+    private AdapterMapper adapterMapper;
+    @Mock
+    private ApiResponseFactory presenter;
 
-    private AddressDTO buildAddress() {
-        return new AddressDTO("Rua das Flores", "123", "São Paulo", "12345678");
+    @Test
+    void shouldReturnUserById() {
+        UUID id = UUID.randomUUID();
+        UserResult result = new UserResult(id, "João Silva", "joao@email.com", "joao123", UserType.RESTAURANT_OWNER, null, LocalDateTime.now());
+        UserResponse responseBody = new UserResponse(id, "João Silva", "joao@email.com", "joao123", UserType.RESTAURANT_OWNER, null, result.lastUpdatedAt());
+        ResponseEntity<ApiSuccessResponse<UserResponse>> response = ApiSuccessResponse.ok(responseBody);
+        when(findUserByIdUseCase.execute(id)).thenReturn(result);
+        when(adapterMapper.toResponse(result)).thenReturn(responseBody);
+        when(presenter.ok(responseBody)).thenReturn(response);
+
+        ResponseEntity<ApiSuccessResponse<UserResponse>> actual = controller.findById(id);
+
+        assertThat(actual.getStatusCode().value()).isEqualTo(200);
+        verify(findUserByIdUseCase).execute(id);
     }
 
-    private UserRequestDTO buildRequest() {
-        return new UserRequestDTO("João Silva", "joao@email.com", "joao123", "123456",
-                buildAddress(), UserType.RESTAURANT_OWNER);
+    @Test
+    void shouldCreateUserSuccessfully() {
+        UserRequest request = new UserRequest("João Silva", "joao@email.com", "joao123", "123456", null, UserType.RESTAURANT_OWNER);
+        UserCreateCommand command = new UserCreateCommand("João Silva", "joao@email.com", "joao123", "123456", null, UserType.RESTAURANT_OWNER);
+        UserResult result = new UserResult(UUID.randomUUID(), "João Silva", "joao@email.com", "joao123", UserType.RESTAURANT_OWNER, null, LocalDateTime.now());
+        UserResponse responseBody = new UserResponse(result.id(), result.name(), result.email(), result.login(), result.type(), null, result.lastUpdatedAt());
+        ResponseEntity<ApiSuccessResponse<UserResponse>> response = ApiSuccessResponse.created(responseBody, "Usuário criado com sucesso");
+        when(adapterMapper.toCommand(request)).thenReturn(command);
+        when(createUserUseCase.execute(command)).thenReturn(result);
+        when(adapterMapper.toResponse(result)).thenReturn(responseBody);
+        when(presenter.created(responseBody, "Usuário criado com sucesso")).thenReturn(response);
+
+        ResponseEntity<ApiSuccessResponse<UserResponse>> actual = controller.create(request);
+
+        assertThat(actual.getStatusCode().value()).isEqualTo(201);
+        verify(createUserUseCase).execute(command);
     }
 
-    private UserResponseDTO buildResponse() {
-        return new UserResponseDTO(UUID.randomUUID(), "João Silva", "joao@email.com", "joao123",
-                UserType.RESTAURANT_OWNER, buildAddress(), LocalDateTime.now());
+    @Test
+    void shouldPatchUserSuccessfully() {
+        UUID id = UUID.randomUUID();
+        UserPatchRequest request = new UserPatchRequest("Novo Nome", null, null, null);
+        UserPatchCommand command = new UserPatchCommand("Novo Nome", null, null, null);
+        UserResult result = new UserResult(id, "Novo Nome", "joao@email.com", "joao123", UserType.RESTAURANT_OWNER, null, LocalDateTime.now());
+        UserResponse responseBody = new UserResponse(id, "Novo Nome", "joao@email.com", "joao123", UserType.RESTAURANT_OWNER, null, result.lastUpdatedAt());
+        ResponseEntity<ApiSuccessResponse<UserResponse>> response = ApiSuccessResponse.ok(responseBody);
+        when(adapterMapper.toCommand(request)).thenReturn(command);
+        when(patchUserUseCase.execute(id, command)).thenReturn(result);
+        when(adapterMapper.toResponse(result)).thenReturn(responseBody);
+        when(presenter.ok(responseBody)).thenReturn(response);
+
+        ResponseEntity<ApiSuccessResponse<UserResponse>> actual = controller.patch(id, request);
+
+        assertThat(actual.getStatusCode().value()).isEqualTo(200);
+        verify(patchUserUseCase).execute(id, command);
     }
 
-    @Nested
-    class FindByIdTests {
-        @Test
-        void shouldReturnUserById() {
-            UUID id = UUID.randomUUID();
-            UserResponseDTO responseDTO = buildResponse();
-            when(service.findById(id)).thenReturn(responseDTO);
+    @Test
+    void shouldDeleteUserSuccessfully() {
+        UUID id = UUID.randomUUID();
+        ResponseEntity<Void> response = ApiSuccessResponse.noContent();
+        doNothing().when(deleteUserUseCase).execute(id);
+        when(presenter.noContent()).thenReturn(response);
 
-            ResponseEntity<ApiSuccessResponse<UserResponseDTO>> response = controller.findById(id);
+        ResponseEntity<Void> actual = controller.delete(id);
 
-            assertThat(response.getStatusCode().value()).isEqualTo(200);
-            assertThat(response.getBody().data()).isEqualTo(responseDTO);
-            verify(service).findById(id);
-        }
+        assertThat(actual.getStatusCode().value()).isEqualTo(204);
+        verify(deleteUserUseCase).execute(id);
     }
 
-    @Nested
-    class SearchByNameTests {
-        @Test
-        void shouldReturnSearchResults() {
-            UserResponseDTO responseDTO = buildResponse();
-            Page<UserResponseDTO> page = new PageImpl<>(List.of(responseDTO), PageRequest.of(0, 10), 1);
-            when(service.searchByName(eq("João"), any())).thenReturn(page);
+    @Test
+    void shouldReturnSearchResults() {
+        UserResult result = new UserResult(UUID.randomUUID(), "João Silva", "joao@email.com", "joao123", UserType.RESTAURANT_OWNER, null, LocalDateTime.now());
+        UserResponse responseItem = new UserResponse(result.id(), result.name(), result.email(), result.login(), result.type(), null, result.lastUpdatedAt());
+        Page<UserResult> page = new PageImpl<>(List.of(result), PageRequest.of(0, 10), 1);
+        Page<UserResponse> mappedPage = new PageImpl<>(List.of(responseItem), PageRequest.of(0, 10), 1);
+        ResponseEntity<ApiSuccessResponse<List<UserResponse>>> response = ApiSuccessResponse.ok(mappedPage.getContent(), br.com.fiap.techfood.adapters.response.api.Meta.from(mappedPage));
+        when(searchUsersByNameUseCase.execute("João", PageRequest.of(0, 10))).thenReturn(page);
+        when(adapterMapper.toResponse(result)).thenReturn(responseItem);
+        when(presenter.okPage(org.mockito.ArgumentMatchers.<Page<UserResponse>>any())).thenReturn(response);
 
-            ResponseEntity<ApiSuccessResponse<List<UserResponseDTO>>> response =
-                    controller.searchByName("João", 0, 10);
+        ResponseEntity<ApiSuccessResponse<List<UserResponse>>> actual = controller.searchByName("João", 0, 10);
 
-            assertThat(response.getStatusCode().value()).isEqualTo(200);
-            assertThat(response.getBody().data()).hasSize(1);
-            assertThat(response.getBody().meta().totalElements()).isEqualTo(1);
-            verify(service).searchByName(eq("João"), any());
-        }
-
-        @Test
-        void shouldReturnEmptyListWhenNoMatch() {
-            Page<UserResponseDTO> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
-            when(service.searchByName(eq("Desconhecido"), any())).thenReturn(emptyPage);
-
-            ResponseEntity<ApiSuccessResponse<List<UserResponseDTO>>> response =
-                    controller.searchByName("Desconhecido", 0, 10);
-
-            assertThat(response.getBody().data()).isEmpty();
-            assertThat(response.getBody().meta().totalElements()).isZero();
-        }
-    }
-
-    @Nested
-    class CreateUserTests {
-        @Test
-        void shouldCreateUserSuccessfully() {
-            UserRequestDTO request = buildRequest();
-            UserResponseDTO responseDTO = buildResponse();
-            when(service.create(request)).thenReturn(responseDTO);
-
-            ResponseEntity<ApiSuccessResponse<UserResponseDTO>> response = controller.create(request);
-
-            assertThat(response.getStatusCode().value()).isEqualTo(201);
-            assertThat(response.getBody().message()).isEqualTo("Usuário criado com sucesso");
-            assertThat(response.getBody().data()).isEqualTo(responseDTO);
-            verify(service, times(1)).create(request);
-        }
-    }
-
-    @Nested
-    class PatchUserTests {
-        @Test
-        void shouldPatchUserSuccessfully() {
-            UUID id = UUID.randomUUID();
-            UserPatchDTO patchDTO = new UserPatchDTO("Novo Nome", null, null, null);
-            UserResponseDTO responseDTO = buildResponse();
-            when(service.patch(id, patchDTO)).thenReturn(responseDTO);
-
-            ResponseEntity<ApiSuccessResponse<UserResponseDTO>> response = controller.patch(id, patchDTO);
-
-            assertThat(response.getStatusCode().value()).isEqualTo(200);
-            assertThat(response.getBody().data()).isEqualTo(responseDTO);
-            verify(service).patch(id, patchDTO);
-        }
-    }
-
-    @Nested
-    class DeleteUserTests {
-        @Test
-        void shouldDeleteUserSuccessfully() {
-            UUID id = UUID.randomUUID();
-            doNothing().when(service).delete(id);
-
-            ResponseEntity<Void> response = controller.delete(id);
-
-            assertThat(response.getStatusCode().value()).isEqualTo(204);
-            verify(service, times(1)).delete(id);
-        }
+        assertThat(actual.getStatusCode().value()).isEqualTo(200);
+        verify(searchUsersByNameUseCase).execute("João", PageRequest.of(0, 10));
     }
 }

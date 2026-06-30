@@ -1,10 +1,10 @@
 package br.com.fiap.techfood.application.usecase.user;
 
+import br.com.fiap.techfood.application.dto.UserPatchCommand;
+import br.com.fiap.techfood.application.dto.UserResult;
 import br.com.fiap.techfood.application.gateway.UserGateway;
-import br.com.fiap.techfood.dto.request.UserPatchDTO;
-import br.com.fiap.techfood.dto.response.UserResponseDTO;
+import br.com.fiap.techfood.application.mapper.ApplicationUserMapper;
 import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
-import br.com.fiap.techfood.mapper.UserMapper;
 import br.com.fiap.techfood.model.User;
 import org.springframework.stereotype.Component;
 
@@ -15,40 +15,40 @@ import java.util.UUID;
 public class PatchUserUseCase {
 
     private final UserGateway userGateway;
-    private final UserMapper mapper;
+    private final ApplicationUserMapper mapper;
 
-    public PatchUserUseCase(UserGateway userGateway, UserMapper mapper) {
+    public PatchUserUseCase(UserGateway userGateway, ApplicationUserMapper mapper) {
         this.userGateway = userGateway;
         this.mapper = mapper;
     }
 
-    public UserResponseDTO execute(UUID id, UserPatchDTO dto) {
+    public UserResult execute(UUID id, UserPatchCommand command) {
         User user = userGateway.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
-        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
-            if (userGateway.existsByEmail(dto.email())) {
+        if (command.email() != null && !command.email().equals(user.getEmail())) {
+            if (userGateway.existsByEmail(command.email())) {
                 throw new ResourceAlreadyExistsException("Email já cadastrado");
             }
-            user.setEmail(dto.email());
+            user.setEmail(command.email());
         }
 
-        if (dto.login() != null && !dto.login().equals(user.getLogin())) {
-            if (userGateway.existsByLogin(dto.login())) {
+        if (command.login() != null && !command.login().equals(user.getLogin())) {
+            if (userGateway.existsByLogin(command.login())) {
                 throw new ResourceAlreadyExistsException("Login já cadastrado");
             }
-            user.setLogin(dto.login());
+            user.setLogin(command.login());
         }
 
-        if (dto.name() != null) {
-            user.setName(dto.name());
+        if (command.name() != null) {
+            user.setName(command.name());
         }
 
-        if (dto.address() != null) {
-            user.setAddress(mapper.toAddress(dto.address()));
+        if (command.address() != null) {
+            user.setAddress(mapper.toModel(command.address()));
         }
 
         user = userGateway.save(user);
-        return mapper.toResponse(user);
+        return mapper.toResult(user);
     }
 }

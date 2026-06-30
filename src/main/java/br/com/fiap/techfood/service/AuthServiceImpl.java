@@ -1,11 +1,11 @@
 package br.com.fiap.techfood.service;
 
+import br.com.fiap.techfood.application.dto.ChangePasswordCommand;
+import br.com.fiap.techfood.application.dto.LoginCommand;
+import br.com.fiap.techfood.application.dto.TokenResult;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.usecase.auth.ChangePasswordUseCase;
 import br.com.fiap.techfood.application.usecase.login.LoginUseCase;
-import br.com.fiap.techfood.dto.request.ChangePasswordDTO;
-import br.com.fiap.techfood.dto.request.LoginRequestDTO;
-import br.com.fiap.techfood.dto.response.TokenResponseDTO;
 import br.com.fiap.techfood.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,11 +40,11 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
                 .build();
     }
 
-    public TokenResponseDTO login(LoginRequestDTO dto) {
-        return loginUseCase.execute(dto);
+    public TokenResult login(LoginCommand command) {
+        return loginUseCase.execute(command);
     }
 
-    public void changePassword(UUID id, ChangePasswordDTO dto) {
-        changePasswordUseCase.execute(id, dto);
+    public void changePassword(UUID id, ChangePasswordCommand command) {
+        changePasswordUseCase.execute(id, command);
     }
 }
