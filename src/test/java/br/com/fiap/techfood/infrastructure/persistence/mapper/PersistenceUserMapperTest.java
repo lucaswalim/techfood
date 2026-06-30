@@ -1,11 +1,11 @@
 package br.com.fiap.techfood.infrastructure.persistence.mapper;
 
+import br.com.fiap.techfood.domain.user.Customer;
+import br.com.fiap.techfood.domain.user.User;
+import br.com.fiap.techfood.domain.user.UserType;
+import br.com.fiap.techfood.domain.valueobject.Address;
 import br.com.fiap.techfood.infrastructure.persistence.entity.CustomerEntity;
 import br.com.fiap.techfood.infrastructure.persistence.entity.UserEntity;
-import br.com.fiap.techfood.model.Address;
-import br.com.fiap.techfood.model.Customer;
-import br.com.fiap.techfood.model.User;
-import br.com.fiap.techfood.model.UserType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -20,15 +20,15 @@ class PersistenceUserMapperTest {
     @Test
     void shouldMapModelToEntityAndBack() {
         UUID id = UUID.randomUUID();
-        Customer model = Customer.builder()
-                .id(id)
-                .name("Maria")
-                .email("maria@email.com")
-                .login("maria123")
-                .password("hashed")
-                .lastUpdatedAt(LocalDateTime.of(2026, 1, 10, 8, 30))
-                .address(new Address("Rua A", "10", "Sao Paulo", "01010101"))
-                .build();
+        Customer model = new Customer(
+                id,
+                "Maria",
+                "maria@email.com",
+                "maria123",
+                "hashed",
+                LocalDateTime.of(2026, 1, 10, 8, 30),
+                new Address("Rua A", "10", "Sao Paulo", "01010101")
+        );
 
         UserEntity entity = mapper.toEntity(model);
         User remapped = mapper.toModel(entity);

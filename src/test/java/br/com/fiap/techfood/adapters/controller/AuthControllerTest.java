@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.controller;
+package br.com.fiap.techfood.adapters.controller;
 
 import br.com.fiap.techfood.adapters.controller.AuthController;
 import br.com.fiap.techfood.adapters.mapper.AdapterMapper;

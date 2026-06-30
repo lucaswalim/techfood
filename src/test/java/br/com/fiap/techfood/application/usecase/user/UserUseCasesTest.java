@@ -10,10 +10,10 @@ import br.com.fiap.techfood.application.gateway.PasswordEncoderGateway;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.mapper.ApplicationUserMapper;
 import br.com.fiap.techfood.application.usecase.createuser.CreateUserUseCase;
-import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
-import br.com.fiap.techfood.model.Address;
-import br.com.fiap.techfood.model.Customer;
-import br.com.fiap.techfood.model.User;
+import br.com.fiap.techfood.domain.user.Customer;
+import br.com.fiap.techfood.domain.user.User;
+import br.com.fiap.techfood.domain.user.UserType;
+import br.com.fiap.techfood.domain.valueobject.Address;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -57,20 +57,20 @@ class UserUseCasesTest {
     private PasswordEncoderGateway passwordEncoderGateway;
 
     private Customer buildCustomer(UUID id, String email, String login) {
-        return Customer.builder()
-                .id(id)
-                .name("João Silva")
-                .email(email)
-                .login(login)
-                .password("hashed-password")
-                .address(new Address("Rua das Flores", "123", "São Paulo", "01310100"))
-                .lastUpdatedAt(LocalDateTime.now())
-                .build();
+        return new Customer(
+                id,
+                "João Silva",
+                email,
+                login,
+                "hashed-password",
+                LocalDateTime.now(),
+                new Address("Rua das Flores", "123", "São Paulo", "01310100")
+        );
     }
 
     @Test
     void shouldCreateUserSuccessfully() {
-        UserCreateCommand command = new UserCreateCommand("João", "test@email.com", "testlogin", "123456", new AddressData("Rua", "1", "SP", "01310100"), br.com.fiap.techfood.model.UserType.CUSTOMER);
+        UserCreateCommand command = new UserCreateCommand("João", "test@email.com", "testlogin", "123456", new AddressData("Rua", "1", "SP", "01310100"), UserType.CUSTOMER);
         User user = buildCustomer(UUID.randomUUID(), "test@email.com", "testlogin");
         User savedUser = buildCustomer(UUID.randomUUID(), "test@email.com", "testlogin");
         UserResult result = new UserResult(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getLogin(), savedUser.getType(), null, savedUser.getLastUpdatedAt());

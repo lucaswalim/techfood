@@ -1,8 +1,8 @@
-package br.com.fiap.techfood.security;
+package br.com.fiap.techfood.infrastructure.security;
 
+import br.com.fiap.techfood.domain.user.Customer;
+import br.com.fiap.techfood.domain.valueobject.Address;
 import br.com.fiap.techfood.infrastructure.security.JwtService;
-import br.com.fiap.techfood.model.Address;
-import br.com.fiap.techfood.model.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,15 +28,15 @@ class JwtServiceTest {
     }
 
     private Customer buildUser() {
-        return Customer.builder()
-                .id(UUID.randomUUID())
-                .name("João Silva")
-                .email("joao@email.com")
-                .login("joao123")
-                .password("hashed-password")
-                .address(new Address("Rua das Flores", "123", "São Paulo", "01310100"))
-                .lastUpdatedAt(LocalDateTime.now())
-                .build();
+        return new Customer(
+                UUID.randomUUID(),
+                "João Silva",
+                "joao@email.com",
+                "joao123",
+                "hashed-password",
+                LocalDateTime.now(),
+                new Address("Rua das Flores", "123", "São Paulo", "01310100")
+        );
     }
 
     @Nested

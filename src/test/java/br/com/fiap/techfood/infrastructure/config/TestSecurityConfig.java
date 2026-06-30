@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.config;
+package br.com.fiap.techfood.infrastructure.config;
 
 import br.com.fiap.techfood.infrastructure.security.JwtService;
 import org.springframework.boot.test.context.TestConfiguration;

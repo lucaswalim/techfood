@@ -7,9 +7,9 @@ import br.com.fiap.techfood.application.gateway.PasswordEncoderGateway;
 import br.com.fiap.techfood.application.gateway.TokenGateway;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.usecase.login.LoginUseCase;
-import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
-import br.com.fiap.techfood.model.Address;
-import br.com.fiap.techfood.model.Customer;
+import br.com.fiap.techfood.domain.user.Customer;
+import br.com.fiap.techfood.domain.valueobject.Address;
+import br.com.fiap.techfood.application.exceptions.InvalidCredentialsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,15 +42,15 @@ class AuthUseCasesTest {
     private static final UUID USER_ID = UUID.randomUUID();
 
     private Customer buildUser(String login, String password) {
-        return Customer.builder()
-                .id(USER_ID)
-                .name("Joao da Silva")
-                .email("joao@email.com")
-                .login(login)
-                .password(password)
-                .address(new Address("Rua", "123", "Pindamonhangaba", "12345678"))
-                .lastUpdatedAt(LocalDateTime.now())
-                .build();
+        return new Customer(
+                USER_ID,
+                "Joao da Silva",
+                "joao@email.com",
+                login,
+                password,
+                LocalDateTime.now(),
+                new Address("Rua", "123", "Pindamonhangaba", "12345678")
+        );
     }
 
     @Test

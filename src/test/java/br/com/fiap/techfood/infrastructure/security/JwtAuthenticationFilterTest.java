@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.security;
+package br.com.fiap.techfood.infrastructure.security;
 
 import br.com.fiap.techfood.infrastructure.security.JwtAuthenticationFilter;
 import br.com.fiap.techfood.infrastructure.security.JwtService;

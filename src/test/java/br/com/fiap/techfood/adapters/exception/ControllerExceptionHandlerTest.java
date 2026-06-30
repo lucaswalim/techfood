@@ -1,8 +1,7 @@
-package br.com.fiap.techfood.exceptions.handlers;
+package br.com.fiap.techfood.adapters.exception;
 
-import br.com.fiap.techfood.adapters.exception.ControllerExceptionHandler;
-import br.com.fiap.techfood.config.TestSecurityConfig;
-import br.com.fiap.techfood.controller.TestExceptionController;
+import br.com.fiap.techfood.adapters.controller.TestExceptionController;
+import br.com.fiap.techfood.infrastructure.config.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

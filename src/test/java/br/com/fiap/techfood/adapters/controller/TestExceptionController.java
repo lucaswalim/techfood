@@ -1,8 +1,8 @@
-package br.com.fiap.techfood.controller;
+package br.com.fiap.techfood.adapters.controller;
 
-import br.com.fiap.techfood.dto.request.UserRequestDTO;
-import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
-import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
+import br.com.fiap.techfood.adapters.request.UserRequest;
+import br.com.fiap.techfood.application.exceptions.InvalidCredentialsException;
+import br.com.fiap.techfood.application.exceptions.ResourceAlreadyExistsException;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +38,7 @@ public class TestExceptionController {
     }
 
     @PostMapping("/validate")
-    public void validate(@RequestBody @Valid UserRequestDTO dto) {
-        // apenas para disparar validação
+    public void validate(@RequestBody @Valid UserRequest dto) {
+        // endpoint auxiliar para disparar validação
     }
 }

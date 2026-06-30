@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.controller;
+package br.com.fiap.techfood.adapters.controller;
 
 import br.com.fiap.techfood.adapters.controller.UserController;
 import br.com.fiap.techfood.adapters.mapper.AdapterMapper;
@@ -15,7 +15,7 @@ import br.com.fiap.techfood.application.usecase.user.DeleteUserUseCase;
 import br.com.fiap.techfood.application.usecase.user.FindUserByIdUseCase;
 import br.com.fiap.techfood.application.usecase.user.PatchUserUseCase;
 import br.com.fiap.techfood.application.usecase.user.SearchUsersByNameUseCase;
-import br.com.fiap.techfood.model.UserType;
+import br.com.fiap.techfood.domain.user.UserType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
