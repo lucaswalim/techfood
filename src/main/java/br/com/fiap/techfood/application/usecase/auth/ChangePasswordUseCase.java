@@ -3,13 +3,11 @@ package br.com.fiap.techfood.application.usecase.auth;
 import br.com.fiap.techfood.application.dto.ChangePasswordCommand;
 import br.com.fiap.techfood.application.gateway.PasswordEncoderGateway;
 import br.com.fiap.techfood.application.gateway.UserGateway;
-import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.application.exceptions.InvalidCredentialsException;
+import br.com.fiap.techfood.domain.user.User;
 
 import java.util.UUID;
 
-@Component
 public class ChangePasswordUseCase {
 
     private final UserGateway userGateway;

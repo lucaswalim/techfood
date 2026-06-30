@@ -5,11 +5,9 @@ import br.com.fiap.techfood.application.dto.TokenResult;
 import br.com.fiap.techfood.application.gateway.PasswordEncoderGateway;
 import br.com.fiap.techfood.application.gateway.TokenGateway;
 import br.com.fiap.techfood.application.gateway.UserGateway;
-import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.application.exceptions.InvalidCredentialsException;
+import br.com.fiap.techfood.domain.user.User;
 
-@Component
 public class LoginUseCase {
 
     private final UserGateway userGateway;

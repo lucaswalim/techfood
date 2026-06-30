@@ -1,8 +1,8 @@
 package br.com.fiap.techfood.adapters.exception;
 
 import br.com.fiap.techfood.adapters.response.api.ValidationError;
-import br.com.fiap.techfood.exceptions.InvalidCredentialsException;
-import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
+import br.com.fiap.techfood.application.exceptions.InvalidCredentialsException;
+import br.com.fiap.techfood.application.exceptions.ResourceAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;

@@ -3,19 +3,17 @@ package br.com.fiap.techfood.application.mapper;
 import br.com.fiap.techfood.application.dto.AddressData;
 import br.com.fiap.techfood.application.dto.UserCreateCommand;
 import br.com.fiap.techfood.application.dto.UserResult;
-import br.com.fiap.techfood.model.Address;
-import br.com.fiap.techfood.model.Customer;
-import br.com.fiap.techfood.model.RestaurantOwner;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.domain.user.Customer;
+import br.com.fiap.techfood.domain.user.RestaurantOwner;
+import br.com.fiap.techfood.domain.user.User;
+import br.com.fiap.techfood.domain.valueobject.Address;
 
-@Component
 public class ApplicationUserMapper {
 
     public User toModel(UserCreateCommand command) {
         User user = switch (command.type()) {
-            case CUSTOMER -> Customer.builder().build();
-            case RESTAURANT_OWNER -> RestaurantOwner.builder().build();
+            case CUSTOMER -> new Customer();
+            case RESTAURANT_OWNER -> new RestaurantOwner();
         };
 
         user.setName(trim(command.name()));
@@ -30,12 +28,12 @@ public class ApplicationUserMapper {
             return null;
         }
 
-        return Address.builder()
-                .street(trim(data.street()))
-                .number(trim(data.number()))
-                .city(trim(data.city()))
-                .zipCode(trim(data.zipCode()))
-                .build();
+        return new Address(
+                trim(data.street()),
+                trim(data.number()),
+                trim(data.city()),
+                trim(data.zipCode())
+        );
     }
 
     public UserResult toResult(User user) {

@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.config;
+package br.com.fiap.techfood.infrastructure.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;

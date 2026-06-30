@@ -1,7 +1,7 @@
 package br.com.fiap.techfood.adapters.response;
 
 import br.com.fiap.techfood.adapters.request.AddressRequest;
-import br.com.fiap.techfood.model.UserType;
+import br.com.fiap.techfood.domain.user.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;

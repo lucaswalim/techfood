@@ -1,6 +1,6 @@
 package br.com.fiap.techfood.application.gateway;
 
-import br.com.fiap.techfood.model.User;
+import br.com.fiap.techfood.domain.user.User;
 
 import java.util.Optional;
 import java.util.UUID;

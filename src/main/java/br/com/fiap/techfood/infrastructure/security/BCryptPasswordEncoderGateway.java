@@ -2,9 +2,7 @@ package br.com.fiap.techfood.infrastructure.security;
 
 import br.com.fiap.techfood.application.gateway.PasswordEncoderGateway;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 
-@Component
 public class BCryptPasswordEncoderGateway implements PasswordEncoderGateway {
 
     private final BCryptPasswordEncoder passwordEncoder;

@@ -1,6 +1,6 @@
 package br.com.fiap.techfood.infrastructure.security;
 
-import br.com.fiap.techfood.model.User;
+import br.com.fiap.techfood.domain.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

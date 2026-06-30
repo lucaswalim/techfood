@@ -3,13 +3,11 @@ package br.com.fiap.techfood.application.usecase.user;
 import br.com.fiap.techfood.application.dto.UserResult;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.mapper.ApplicationUserMapper;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.domain.user.User;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Component
 public class FindUserByIdUseCase {
 
     private final UserGateway userGateway;

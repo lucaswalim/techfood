@@ -1,6 +1,6 @@
 package br.com.fiap.techfood.adapters.request;
 
-import br.com.fiap.techfood.model.UserType;
+import br.com.fiap.techfood.domain.user.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

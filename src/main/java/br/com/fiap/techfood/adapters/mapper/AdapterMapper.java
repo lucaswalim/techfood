@@ -14,9 +14,7 @@ import br.com.fiap.techfood.application.dto.TokenResult;
 import br.com.fiap.techfood.application.dto.UserCreateCommand;
 import br.com.fiap.techfood.application.dto.UserPatchCommand;
 import br.com.fiap.techfood.application.dto.UserResult;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AdapterMapper {
 
     public UserCreateCommand toCommand(UserRequest request) {

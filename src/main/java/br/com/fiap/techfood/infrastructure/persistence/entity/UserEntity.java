@@ -1,6 +1,6 @@
 package br.com.fiap.techfood.infrastructure.persistence.entity;
 
-import br.com.fiap.techfood.model.UserType;
+import br.com.fiap.techfood.domain.user.UserType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;

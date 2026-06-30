@@ -1,4 +1,4 @@
-package br.com.fiap.techfood.config;
+package br.com.fiap.techfood.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,17 +1,15 @@
 package br.com.fiap.techfood.infrastructure.persistence.mapper;
 
+import br.com.fiap.techfood.domain.user.Customer;
+import br.com.fiap.techfood.domain.user.RestaurantOwner;
+import br.com.fiap.techfood.domain.user.User;
+import br.com.fiap.techfood.domain.user.UserType;
+import br.com.fiap.techfood.domain.valueobject.Address;
 import br.com.fiap.techfood.infrastructure.persistence.entity.AddressEmbeddable;
 import br.com.fiap.techfood.infrastructure.persistence.entity.CustomerEntity;
 import br.com.fiap.techfood.infrastructure.persistence.entity.RestaurantOwnerEntity;
 import br.com.fiap.techfood.infrastructure.persistence.entity.UserEntity;
-import br.com.fiap.techfood.model.Address;
-import br.com.fiap.techfood.model.Customer;
-import br.com.fiap.techfood.model.RestaurantOwner;
-import br.com.fiap.techfood.model.User;
-import br.com.fiap.techfood.model.UserType;
-import org.springframework.stereotype.Component;
 
-@Component
 public class PersistenceUserMapper {
 
     public User toModel(UserEntity entity) {
@@ -20,8 +18,8 @@ public class PersistenceUserMapper {
         }
 
         User model = switch (entity.getType()) {
-            case CUSTOMER -> Customer.builder().build();
-            case RESTAURANT_OWNER -> RestaurantOwner.builder().build();
+            case CUSTOMER -> new Customer();
+            case RESTAURANT_OWNER -> new RestaurantOwner();
         };
 
         model.setId(entity.getId());
@@ -62,12 +60,12 @@ public class PersistenceUserMapper {
             return null;
         }
 
-        return Address.builder()
-                .street(embeddable.getStreet())
-                .number(embeddable.getNumber())
-                .city(embeddable.getCity())
-                .zipCode(embeddable.getZipCode())
-                .build();
+        return new Address(
+                embeddable.getStreet(),
+                embeddable.getNumber(),
+                embeddable.getCity(),
+                embeddable.getZipCode()
+        );
     }
 
     private AddressEmbeddable toEmbeddable(Address address) {

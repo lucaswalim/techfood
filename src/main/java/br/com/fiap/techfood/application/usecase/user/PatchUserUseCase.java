@@ -4,14 +4,12 @@ import br.com.fiap.techfood.application.dto.UserPatchCommand;
 import br.com.fiap.techfood.application.dto.UserResult;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.mapper.ApplicationUserMapper;
-import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.application.exceptions.ResourceAlreadyExistsException;
+import br.com.fiap.techfood.domain.user.User;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Component
 public class PatchUserUseCase {
 
     private final UserGateway userGateway;

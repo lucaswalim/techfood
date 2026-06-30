@@ -5,15 +5,13 @@ import br.com.fiap.techfood.application.gateway.PageResult;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.infrastructure.persistence.entity.UserEntity;
 import br.com.fiap.techfood.infrastructure.persistence.mapper.PersistenceUserMapper;
-import br.com.fiap.techfood.model.User;
+import br.com.fiap.techfood.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
 public class JpaUserGateway implements UserGateway {
 
     private final SpringDataUserRepository repository;

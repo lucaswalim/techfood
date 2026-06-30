@@ -1,10 +1,8 @@
 package br.com.fiap.techfood.infrastructure.security;
 
 import br.com.fiap.techfood.application.gateway.TokenGateway;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.domain.user.User;
 
-@Component
 public class JwtTokenGateway implements TokenGateway {
 
     private final JwtService jwtService;

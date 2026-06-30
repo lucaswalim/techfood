@@ -5,11 +5,9 @@ import br.com.fiap.techfood.application.dto.UserResult;
 import br.com.fiap.techfood.application.gateway.PasswordEncoderGateway;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.mapper.ApplicationUserMapper;
-import br.com.fiap.techfood.exceptions.ResourceAlreadyExistsException;
-import br.com.fiap.techfood.model.User;
-import org.springframework.stereotype.Component;
+import br.com.fiap.techfood.application.exceptions.ResourceAlreadyExistsException;
+import br.com.fiap.techfood.domain.user.User;
 
-@Component
 public class CreateUserUseCase {
 
     private final UserGateway userGateway;

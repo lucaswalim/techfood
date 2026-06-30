@@ -5,15 +5,13 @@ import br.com.fiap.techfood.application.gateway.PageQuery;
 import br.com.fiap.techfood.application.gateway.PageResult;
 import br.com.fiap.techfood.application.gateway.UserGateway;
 import br.com.fiap.techfood.application.mapper.ApplicationUserMapper;
-import br.com.fiap.techfood.model.User;
+import br.com.fiap.techfood.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public class SearchUsersByNameUseCase {
 
     private final UserGateway userGateway;

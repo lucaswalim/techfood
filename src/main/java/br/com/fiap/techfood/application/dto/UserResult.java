@@ -1,6 +1,6 @@
 package br.com.fiap.techfood.application.dto;
 
-import br.com.fiap.techfood.model.UserType;
+import br.com.fiap.techfood.domain.user.UserType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
